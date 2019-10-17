@@ -11,23 +11,21 @@
 \
 Input: Y, X, controls, wgt, method, lambda, sigma, n_boot\
 \
-Output: a list with 3 elements: CDF distances, SE and a list called \'93Details\'94 with the following elements: method, lambda, probs (under I=1), distance
+Output: a list with 3 elements: CDF distances, SE and a list called \'93Details\'94 with the following elements: method, lambda, new_sample (X + weights), KL distance
 \f1  
-\f0 (\cf2 between P(X | I = 0) and\'a0P(X | I = 1), tau, tau\'92s SE, omega (\cf3 difference in the mean output)\cf0  \
+\f0 (\cf2 between P(X | I = 0) and\'a0P(X | I = 1), tau, tau\'92s SE, omega (\cf3 difference in the mean output), norm_factors \cf0  \
 \
 1.1 non_parm()\
 \
 Input: Y, X, controls, wgt, lambda\
 \
-\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
-\cf0 Output: wgt1(under I=1)\
+Output: wgt1(under I=1)\
 \
 1.2 nn()\
 \
 Input: Y, X, controls, wgt, lambda, sigma\
 \
-\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
-\cf0 Output: wgt1 (under I=1)\
+Output: wgt1 (under I=1)\
 \
 1.3 dev_moments()\
 \
@@ -35,17 +33,19 @@ Input: beta, base, controls, wgt\
 \
 Output: difference\
 \
-1.4 per_distance()\
-\
-Input: p1, X, wgt, n_quant\
-\
-Output: cdf_dist \
-\
-1.5 part_cor()\
+1.4 part_cor()\
 \
 Input: Y, X, controls, wgt\
 \
 Output: estimates\
+\
+\
+\
+1.5 per_distance()\
+\
+Input: p1, X, wgt, n_quant\
+\
+Output: cdf_dist \
 \
 1.6 mean_diff()\
 \
