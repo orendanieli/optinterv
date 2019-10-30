@@ -10,7 +10,7 @@ vars     <- matrix(2 * runif(n * p), n, p)
 controls <- 3 * matrix(runif(n * j), n, j)
 outcome  <- rnorm(n) + apply(controls, 1, sum) + vars[,1]
 
-test_that("controls were changed using the non-parametric method", {
+test_that("controls weren't changed using the non-parametric method", {
   #calculate means
   wgt1 <- non_parm(outcome, vars, controls)
   c1   <- apply(controls ,2 ,function(v) weighted.mean(v, wgt1))
@@ -18,8 +18,14 @@ test_that("controls were changed using the non-parametric method", {
   expect_true(sum(abs(c1 - c0)) < .000001)
 })
 
+test_that("non-parametric method returns reasonable weights", {
+  quant90 <- quantile(vars[,1], probs = 0.9)
+  wgt1 <- non_parm(outcome, vars, controls)
+  high_wgt <- wgt1[vars[,1] > quant90]
+  expect_true(median(high_wgt) > 1)
+})
 
-test_that("controls were changed using the nearest-neighbors method", {
+test_that("controls weren't changed using the nearest-neighbors method", {
   #calculate means
   wgt1 <- nn(outcome, vars, controls)
   c1   <- apply(controls ,2 ,function(v) weighted.mean(v, wgt1))
@@ -27,5 +33,5 @@ test_that("controls were changed using the nearest-neighbors method", {
   expect_true(sum(abs(c1 - c0)) < .000001)
 })
 
-#write test for "reasonable" results
+
 
