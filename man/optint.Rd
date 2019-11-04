@@ -4,8 +4,9 @@
 \alias{optint}
 \title{Optimal intervention}
 \usage{
-optint(Y, X, controls = NULL, wgt = NULL, method = "non-parametric",
-  lambda = 100, sigma = 1, n.boot = 1000, sign.factor = 2/3,
+optint(Y, X, controls = NULL, wgt = rep(1, length(Y)),
+  method = "non-parametric", lambda = 100, sigma = 1,
+  n.boot = 1000, sign.factor = 2/3, n.quant = round(length(Y)/5),
   seed = runif(1, 0, .Machine$integer.max), ...)
 }
 \arguments{
@@ -30,7 +31,7 @@ intervention.}
 \item{n.boot}{number of bootstrap replications to use for the standard errors
 calculation.}
 
-\item{sign.factor}{}
+\item{n.quant}{}
 
 \item{seed}{}
 }

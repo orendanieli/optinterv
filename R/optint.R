@@ -17,6 +17,7 @@
 #' @param n.boot number of bootstrap replications to use for the standard errors
 #'               calculation.
 #' @param sign.factor
+#' @param n.quant
 #'
 #' @param seed
 #'
@@ -24,16 +25,49 @@
 
 optint <- function(Y, X,
                   controls = NULL,
-                  wgt = NULL,
+                  wgt = rep(1, length(Y)),
                   method = "non-parametric",
                   lambda = 100,
                   sigma = 1,
                   n.boot = 1000,
                   sign.factor = 2/3,
+                  n.quant = 20,
                   seed = runif(1, 0, .Machine$integer.max),
                   ...){
-  #for nn & non-par
-  if (min(Y) <= 0){
-    Y = exp(Y)
+  #prepare data
+  X_std <- apply(X, 2, function(x, w = wgt){x / sqrt(Hmisc::wtd.var(x, w))})
+  if(min(Y) <= 0){
+    Y_pos <- exp(Y)
+  } else {
+    Y_pos <- Y
   }
+  if (method == "non-parametric"){
+    non_parm_boot <- function(d, i){
+      w <- non_parm(Y_pos[i], X_std[i,], controls[i], wgt =  wgt[i], lambda =  lambda)
+      dists <- apply(X_std[i,], 2, function(v) per_distance(v, n.quant, wgt[i], w))
+      diff <- outcome_diff(Y[i], w, wgt[i])
+      c(dists, diff)
+    }
+    res <- boot::boot(1:length(Y), non_parm_boot, n.boot, stype = "i")
+    wgt1 <- non_parm(Y_pos, X_std, controls, wgt =  wgt, lambda =  lambda)
+  }
+  signs <- apply(X_std, 2, function(v) per_distance(v, n.quant, wgt, wgt1, sign.factor, T))
+  n <- length(res$t0)
+  estimates <- res$t0[-n]
+  estimates_sd <- apply(res$t[,-n], 2, sd)
+  stand_factor <- sd(estimates)
+  output <- list(estimates = estimates / stand_factor,
+                 estimates_sd = estimates_sd / stand_factor,
+                 details = list(Y_diff = res$t0[n],
+                                Y_diff_sd = sd(res$t[n]),
+                                method = method,
+                                lambda = lambda,
+                                new_sample = cbind(X,controls,wgt1),
+                                signs = signs,
+                                stand_factor = stand_factor,
+                                kl_distance = NULL))
+  class(output) <- "optint"
+  return(output)
 }
+
+

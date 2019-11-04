@@ -4,14 +4,16 @@ Title: Optimal Intervention
 Version: 0.1.0
 Author: Oren Danieli & Elad Guttman
 Maintainer: The package maintainer <yourself@somewhere.net>
-Description: A package for identifying the factors with the greatest potential 
+Description: identifies the factors with the greatest potential 
   to increase a pre-specified outcome, using observational data.
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
 Imports:
     rootSolve,
-    distances
+    distances,
+    weights,
+    boot
 RoxygenNote: 6.1.1
 Suggests: 
     knitr,

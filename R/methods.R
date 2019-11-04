@@ -9,10 +9,7 @@
 #'
 #' @return vector of weights under I = 1
 
-non_parm <- function(Y, X, controls = NULL, wgt = NULL, lambda = 100, ...){
-  if (is.null(wgt)){
-    wgt <- rep(1,length(Y))
-  }
+non_parm <- function(Y, X, controls = NULL, wgt = rep(1, length(Y)), lambda = 100, ...){
   #basline weights (without controls)
   base_wgt1 <- wgt * Y^(1/lambda)
   if (is.null(controls)){
@@ -57,10 +54,7 @@ dev_moments <- function(beta, base, controls, wgt, ...){
 #'
 #' @return vector of weights under I = 1
 
-nn <- function(Y, X, controls = NULL, wgt = NULL, lambda = 100, sigma = 1, ...){
-  if (is.null(wgt)){
-    wgt <- rep(1,length(Y))
-  }
+nn <- function(Y, X, controls = NULL, wgt = rep(1, length(Y)), lambda = 100, sigma = 1, ...){
   char_matrix <- cbind(X, controls)
   vcov <- cov.wt(char_matrix, wgt)$cov
   #find mehalanobis distance for all pairs
