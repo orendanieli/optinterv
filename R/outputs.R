@@ -79,4 +79,23 @@ wtd_bin <- function(x, n.quant, wgt){
   return(res)
 }
 
+#' Kullback-Liebler Divergence
+#'
+#' Calculates Kullback-Liebler Divergence for two weight vectors.
+#'
+#' @inheritParams per_distance
+#'
+#' @return scalar of kullback-liebler divergence.
+
+kl_dist <- function(wgt, wgt1){
+  #make weights sum to 1
+  wgt <- wgt / sum(wgt)
+  wgt1 <- wgt1 / sum(wgt1)
+  return(sum(wgt1 * log(wgt1 / wgt)))
+}
+
+
+
+
+
 

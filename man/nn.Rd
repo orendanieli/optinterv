@@ -4,7 +4,8 @@
 \alias{nn}
 \title{Nearest-neighbors method}
 \usage{
-nn(Y, X, controls = NULL, wgt = NULL, lambda = 100, sigma = 1, ...)
+nn(Y, X, controls = NULL, wgt = rep(1, length(Y)), lambda = 100,
+  sigma = 1, ...)
 }
 \arguments{
 \item{Y}{outcome vector (must be numeric without NA's).}

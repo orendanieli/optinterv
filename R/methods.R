@@ -16,7 +16,7 @@ non_parm <- function(Y, X, controls = NULL, wgt = rep(1, length(Y)), lambda = 10
     return(base_wgt1)
   } else {
     #add a constant vector to controls
-    controls <- as.matrix(cbind(rep(1,nrow(controls)), controls))
+    controls <- as.matrix(cbind(rep(1, nrow(controls)), controls))
     #define function to solve, plug in variables
     f <- function(b) {dev_moments(b, base_wgt1, controls, wgt)}
     #get solution

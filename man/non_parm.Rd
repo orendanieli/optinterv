@@ -4,7 +4,8 @@
 \alias{non_parm}
 \title{Non-parametric method}
 \usage{
-non_parm(Y, X, controls = NULL, wgt = NULL, lambda = 100, ...)
+non_parm(Y, X, controls = NULL, wgt = rep(1, length(Y)),
+  lambda = 100, ...)
 }
 \arguments{
 \item{Y}{outcome vector (must be numeric without NA's).}

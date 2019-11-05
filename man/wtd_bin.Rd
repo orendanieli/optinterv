@@ -4,7 +4,7 @@
 \alias{wtd_bin}
 \title{Weighted Bin}
 \usage{
-wtd_bin(x, n.quant, wgt = rep(1, length(x)))
+wtd_bin(x, n.quant, wgt)
 }
 \arguments{
 \item{x}{variable.}
