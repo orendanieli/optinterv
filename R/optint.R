@@ -22,6 +22,7 @@
 #' @param seed
 #'
 #' @return an optint object.
+#' @export
 
 optint <- function(Y, X,
                   controls = NULL,
