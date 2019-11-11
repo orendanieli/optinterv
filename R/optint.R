@@ -21,7 +21,7 @@
 #'
 #' @param seed
 #'
-#' @return a optint object.
+#' @return an optint object.
 
 optint <- function(Y, X,
                   controls = NULL,
@@ -73,13 +73,24 @@ optint <- function(Y, X,
 }
 
 
+#' Summary for optint object
+#'
+#' Report results from an optint object
+#'
+#' @param object an optint object
+#' @param r number of decimal places to use
+#'
+#' @export
 
-
-
-summary.optint <- function(object, r = 3){
+summary.optint <- function(object, r = 5){
   x <- object
   est <- round(x$estimates, r)
   se <- round(x$estimates_sd, r)
+  kl <- x$details$kl_distance
+  out <- round(x$details$Y_diff, r)
+  out_sd <- round(x$details$Y_diff_sd, r)
+  out_t <- out / out_sd
+  out_p <- 2 * pnorm(out_t, lower.tail = F)
   n <- length(est)
   var_names <- colnames(x$details$new_sample[,1:n])
   if(is.null(var_names))
@@ -87,14 +98,18 @@ summary.optint <- function(object, r = 3){
       var_names[i] <- paste0("X",i)
   coeffs <- matrix(c(est, se), ncol = 2,
                    dimnames = list(var_names, c("Estimate","Std. error")))
+  out_mat <- matrix(c(out, out_sd, out_t, out_p), ncol = 4,
+                      dimnames = list("E(Y|I=1) - E(Y|I=0)",
+                                      c("Estimate","Std. error", "t value", "P(>|t|)")))
   method <- x$details$method
-  cat("Method:", method, "\n")
-  cat("\n")
-  cat("Lambda =", x$details$lambda, "\n")
+  lambda <- x$details$lambda
+  cat("Method:", method, ", Lambda =", lambda, "\n")
   coef_title <- ifelse(method == "correlations", "Raw Correlations:", "CDF Distances:")
-  cat("\n")
-  cat(coef_title, "\n", "\n")
+  cat("\n",coef_title, "\n", "\n")
   print(coeffs)
+  cat("\n", "The Kullback–Leibler divergence of P(X|I=0) from P(X|I=1) is:", kl, "\n")
+  cat("\n", "Outcome Difference:", "\n", "\n")
+  print(out_mat)
 }
 
 
