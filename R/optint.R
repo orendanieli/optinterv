@@ -7,7 +7,7 @@
 #' @param X data frame or matrix of factors to be considered.
 #' @param controls data frame or matrix of factors to control for. these are factors
 #'                 that we can't consider while looking for the optimal intervention
-#'                 (e.g. gender).
+#'                 (e.g. race).
 #' @param wgt an optional vector of weights.
 #' @param method the method to be used. one of "correlation" / "non-parametric" /
 #'               "nearest-neighbors".

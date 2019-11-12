@@ -16,7 +16,7 @@ optint(Y, X, controls = NULL, wgt = rep(1, length(Y)),
 
 \item{controls}{data frame or matrix of factors to control for. these are factors
 that we can't consider while looking for the optimal intervention
-(e.g. gender).}
+(e.g. race).}
 
 \item{wgt}{an optional vector of weights.}
 
