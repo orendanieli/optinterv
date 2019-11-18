@@ -79,7 +79,7 @@ wtd_bin <- function(x, n.quant, wgt){
   return(res)
 }
 
-#' Kullback-Liebler Divergence
+#' Kullback-Leibler Divergence
 #'
 #' Calculates Kullback-Liebler Divergence for two weight vectors.
 #'
@@ -95,7 +95,10 @@ kl_dist <- function(wgt, wgt1){
 }
 
 
-
+boot_ci <- function(boot.res, sign.level = 0.05){
+  quant <- sign.level / 2
+  apply(boot.res, 2, function(x){quantile(x, probs = c(quant, 1 - quant))})
+}
 
 
 

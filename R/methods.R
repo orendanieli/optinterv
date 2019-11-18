@@ -36,7 +36,7 @@ wgt_adjust <- function(controls, base.wgt1, wgt, ...){
   b0 <- rootSolve::multiroot(f, rep(0,ncol(controls)))$root
   #calculate probs with solution
   wgt1 <- base.wgt1 * exp(controls %*% as.matrix(b0))
-  return(wgt1)
+  return(as.vector(wgt1))
 }
 
 
@@ -73,6 +73,7 @@ nn_wgt <- function(Y, X, controls = NULL, wgt = rep(1, length(Y)), lambda = 100,
   vcov <- cov.wt(char_matrix, wgt)$cov
   #find mehalanobis distance for all pairs
   dist <- distances::distances(char_matrix, normalize = vcov)
+  dist <- as.matrix(dist)
   #log weights matrix (log is for precision)
   lwgt_mat <- -.5 * (dist^2) * (sigma^-2) + (1/lambda) * log(Y) + log(wgt)
   #make max 100 for precision
@@ -85,7 +86,7 @@ nn_wgt <- function(Y, X, controls = NULL, wgt = rep(1, length(Y)), lambda = 100,
   #second, make each column sum to the sampling weight of that column (i)
   wgt_mat <- t(t(wgt_mat) * wgt)
   #sum rows (over i) and that's the overall weight on each observation
-  wgt1 = apply(wgt_mat, 1, sum)
+  wgt1 <- apply(wgt_mat, 1, sum)
   return(wgt1)
 }
 
@@ -148,6 +149,24 @@ nn <- function(Y, X, controls = NULL, wgt = rep(1, length(Y)),
 }
 
 
+#' Partial Correlation
+#'
+#' Calculates correlation between Y and X, holding controls constant
+#'
+#' @inheritParams optint
+#'
+#' @return vector of partial correlations
+
+par_cor = function(Y, X, controls = NULL, wgt = rep(1, length(Y)), ...){
+  if(is.null(controls)){
+    return(as.vector(weights::wtd.cors(X, Y, wgt)))
+  } else {
+    #residualize controls
+    Y <- lm(Y ~ controls, weights = wgt)$residuals
+    X <- lm(X ~ controls, weights = wgt)$residuals
+    return(as.vector(weights::wtd.cors(X, Y, wgt)))
+  }
+}
 
 
 

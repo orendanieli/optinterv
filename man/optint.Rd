@@ -6,8 +6,9 @@
 \usage{
 optint(Y, X, controls = NULL, wgt = rep(1, length(Y)),
   method = "non-parametric", lambda = 100, sigma = 1,
-  n.boot = 1000, sign.factor = 2/3, n.quant = length(Y)/10,
-  seed = runif(1, 0, .Machine$integer.max), ...)
+  grp.size = 30, n.boot = 1000, sign.factor = 2/3,
+  n.quant = length(Y)/10, seed = runif(1, 0, .Machine$integer.max),
+  ...)
 }
 \arguments{
 \item{Y}{outcome vector (must be numeric without NA's).}
