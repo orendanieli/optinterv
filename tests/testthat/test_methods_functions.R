@@ -25,16 +25,18 @@ test_that("non-parametric method returns reasonable weights", {
   expect_true(median(high_wgt) > 1)
 })
 
-test_that("nearest-neighbors method returns reasonable weights", {
-  quant90 <- quantile(vars[,1], probs = 0.9)
-  wgt1 <- nn(outcome, vars, controls)
-  high_wgt <- wgt1[vars[,1] > quant90]
-  expect_true(median(high_wgt) > 1)
+
+test_that("nearest-neighbors returns results which getting closer to the non-parametric
+          results as sigma getting bigger", {
+  wgt1_np <- non_parm(outcome, vars, controls)
+  wgt1_nn_1 <- nn(outcome, vars, controls)
+  wgt1_nn_1000 <- nn(outcome, vars, controls, sigma = 1000)
+  expect_true(sum(abs(wgt1_nn_1 - wgt1_np)) > sum(abs(wgt1_nn_1000 - wgt1_np)))
 })
 
 test_that("(continuous) controls weren't changed using the nearest-neighbors method", {
-  #calculate means
   wgt1 <- nn(outcome, vars, controls)
+  #calculate means
   c1   <- apply(controls ,2 ,function(v) weighted.mean(v, wgt1))
   c0   <- apply(controls, 2, mean)
   expect_true(sum(abs(c1 - c0)) < .000001)
@@ -47,7 +49,7 @@ test_that("(catgorical) controls weren't changed using the nearest-neighbors met
   wgt1 <- nn(outcome, vars, controls)
   c1   <- apply(controls ,2 ,function(v) weighted.mean(v, wgt1))
   c0   <- apply(controls, 2, mean)
-  expect_true(sum(abs(c1 - c0)) < .01)
+  expect_true(sum(abs(c1 - c0)) < .000001)
 })
 
 
@@ -58,5 +60,7 @@ test_that("controls (with one small group) weren't changed using the nearest-nei
   wgt1 <- nn(outcome, vars, controls)
   c1   <- apply(controls ,2 ,function(v) weighted.mean(v, wgt1))
   c0   <- apply(controls, 2, mean)
-  expect_true(sum(abs(c1 - c0)) < .01)
+  expect_true(sum(abs(c1 - c0)) < .000001)
 })
+
+
