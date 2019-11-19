@@ -87,16 +87,30 @@ wtd_bin <- function(x, n.quant, wgt){
 #'
 #' @return scalar of kullback-liebler divergence.
 
-kl_dist <- function(wgt, wgt1){
+
+kl_dist.def <- function(wgt, wgt1, ...){
   #make weights sum to 1
   wgt <- wgt / sum(wgt)
   wgt1 <- wgt1 / sum(wgt1)
   return(sum(wgt1 * log(wgt1 / wgt)))
 }
 
+kl_dist.cor <- function(X, wgt, ni, ...){
+  vcov <- cov.wt(X, wgt)$cov
+  return(t(ni) %*% vcov %*% ni)
+}
 
-boot_ci <- function(boot.res, sign.level = 0.05){
-  quant <- sign.level / 2
+#' Bootstrap Confidence Intervals
+#'
+#' Calculates bootstrap confidence intervals for matrix of bootstrap replicates
+#'
+#' @param boot.res matrix of bootstrap replicates
+#' @param alpha significance level
+#'
+#' @return matrix of confidence intervals
+
+boot_ci <- function(boot.res, alpha = 0.05){
+  quant <- alpha / 2
   apply(boot.res, 2, function(x){quantile(x, probs = c(quant, 1 - quant))})
 }
 
