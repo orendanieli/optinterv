@@ -63,4 +63,18 @@ test_that("controls (with one small group) weren't changed using the nearest-nei
   expect_true(sum(abs(c1 - c0)) < .000001)
 })
 
-
+test_that("nearest-neighbors method returns reasonable weights", {
+  control <- as.matrix(2 * runif(n))
+  x <- as.matrix(3 * runif(n))
+  outcome  <- 5 + rnorm(n) + control[,1] + x[,1]
+  char_mat <- cbind(x, control)
+  vcov <- cov.wt(char_mat)$cov
+  #find mehalanobis distance for all pairs
+  dist <- distances::distances(char_mat, normalize = vcov)
+  dist <- as.matrix(dist)
+  #find representative observation
+  rep_obs <- which.min(as.vector(apply(dist, 2, median)))
+  p <- sum(outcome < outcome[rep_obs]) / n
+  wgt1 <- nn(outcome, x, control)
+  expect_equal(p > 0.5, wgt1[rep_obs] > 1)
+})
