@@ -6,7 +6,7 @@
 \usage{
 optint(Y, X, controls = NULL, wgt = rep(1, length(Y)),
   method = "non-parametric", lambda = 100, sigma = 1,
-  grp.size = 30, n.boot = 1000, sign.factor = 2/3,
+  grp.size = 30, n.boot = 1000, sign.factor = 2/3, alpha = 0.05,
   n.quant = length(Y)/10, seed = runif(1, 0, .Machine$integer.max),
   ...)
 }

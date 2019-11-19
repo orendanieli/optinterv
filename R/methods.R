@@ -151,20 +151,26 @@ nn <- function(Y, X, controls = NULL, wgt = rep(1, length(Y)),
 
 #' Partial Correlation
 #'
-#' Calculates correlation between Y and X, holding controls constant
+#' Calculates correlation / covariance between Y and X, holding controls constant
 #'
 #' @inheritParams optint
 #'
-#' @return vector of partial correlations
+#' @return data frame with partial correlations & covariance
 
 par_cor = function(Y, X, controls = NULL, wgt = rep(1, length(Y)), ...){
   if(is.null(controls)){
-    return(as.vector(weights::wtd.cors(X, Y, wgt)))
+    cors <- as.vector(weights::wtd.cors(X, Y, wgt))
+    Y_sd <- sd(Y)
+    X_sd <- apply(X, 2, sd)
+    return(data.frame(cors, covs = Y_sd * X_sd * cors))
   } else {
     #residualize controls
     Y <- lm(Y ~ controls, weights = wgt)$residuals
     X <- lm(X ~ controls, weights = wgt)$residuals
-    return(as.vector(weights::wtd.cors(X, Y, wgt)))
+    cors <- as.vector(weights::wtd.cors(X, Y, wgt))
+    Y_sd <- sd(Y)
+    X_sd <- apply(X, 2, sd)
+    return(data.frame(cors, covs = Y_sd * X_sd * cors))
   }
 }
 

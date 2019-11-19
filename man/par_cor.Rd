@@ -18,8 +18,8 @@ that we can't consider while looking for the optimal intervention
 \item{wgt}{an optional vector of weights.}
 }
 \value{
-vector of partial correlations
+data frame with partial correlations & covariance
 }
 \description{
-Calculates correlation between Y and X, holding controls constant
+Calculates correlation / covariance between Y and X, holding controls constant
 }

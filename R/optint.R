@@ -18,6 +18,7 @@
 #' @param n.boot number of bootstrap replications to use for the standard errors
 #'               calculation.
 #' @param sign.factor
+#' @param alpha
 #' @param n.quant
 #'
 #' @param seed
@@ -34,9 +35,11 @@ optint <- function(Y, X,
                   grp.size = 30,
                   n.boot = 1000,
                   sign.factor = 2/3,
+                  alpha = 0.05,
                   n.quant = length(Y) / 10,
                   seed = runif(1, 0, .Machine$integer.max),
                   ...){
+  n <- ncol(X)
   set.seed(seed)
   if (method != "correlations"){
     #prepare data
@@ -57,32 +60,39 @@ optint <- function(Y, X,
     res <- boot::boot(1:length(Y), boot_func, n.boot, stype = "i")
     wgt1 <- do.call(func, list(Y_pos, X_std, controls, wgt =  wgt,
                                lambda =  lambda, sigma = sigma, grp.size = grp.size))
-    new_sample <- cbind(X, controls, wgt1)
     signs <- apply(X_std, 2, function(v) per_distance(v, n.quant, wgt, wgt1, sign.factor, T))
-    n <- length(res$t0)
-    estimates <- res$t0[-n]
-    estimates_sd <- apply(res$t[,-n], 2, sd)
+    kl_distance <- kl_dist.def(wgt, wgt1)
   } else {
-    res <- boot::boot(1:length(Y), function(d,i){ par_cor(Y[i], X[i,], controls[i,], wgt[i])},
-                      n.boot, stype = "i")
-    estimates <- res$t0
-    estimates_sd <- apply(res$t, 2, sd)
-    Y_sd <- sqrt(Hmisc::wtd.var(Y, wgt))
-    X_sd <- apply(X, 2, function(x, w = wgt){sqrt(Hmisc::wtd.var(x, w))})
-    X <- t(t(X) + (1/lambda) * Y_sd * X_sd * estimates)
-    new_sample <- cbind(X, controls, wgt)
-    signs <- sign(estimates)
+    boot_func <- function(d, i){
+      cor_cov <- par_cor(Y[i], X[i,], controls[i,], wgt[i])
+      covs <- cor_cov$covs
+      cors <- cor_cov$cors
+      betas <- lm(Y[i] ~ X[i,] + controls[i,], weights = wgt[i])$coefficients
+      diff <- (1/lambda) * (betas[2:(n+1)] %*% covs)
+      c(cors, diff)
+    }
+    res <- boot::boot(1:length(Y), boot_func, n.boot, stype = "i")
+    ni <- (1/lambda) * par_cor(Y, X, controls, wgt)$covs
+    kl_distance <- kl_dist.cor(X, wgt, ni)
+    X <- t(t(X) + ni)
+    wgt1 <- wgt
+    signs <- sign(res$t0[-(n + 1)])
   }
+  estimates <- res$t0[-(n + 1)]
+  estimates_sd <- apply(res$t[,-(n + 1)], 2, sd)
+  ci <- boot_ci(res$t[,-(n + 1)], alpha)
   stand_factor <- sd(estimates)
+  new_sample <- cbind(X, controls, wgt1)
   output <- list(estimates = estimates / stand_factor,
                  estimates_sd = estimates_sd / stand_factor,
-                 details = list(#Y_diff = res$t0[n],
-                                #Y_diff_sd = sd(res$t[,n]),
+                 details = list(Y_diff = res$t0[n + 1],
+                                Y_diff_sd = sd(res$t[,n + 1]),
                                 method = method,
                                 lambda = lambda,
                                 signs = signs,
-                                stand_factor = stand_factor))#,
-                                #kl_distance = kl_dist(wgt, wgt1)))
+                                ci = ci / stand_factor,
+                                stand_factor = stand_factor,
+                                kl_distance = kl_distance))
   if (method == "nearest-neighbors")
     output[["details"]][["sigma"]] <- sigma
   class(output) <- "optint"
@@ -103,18 +113,18 @@ summary.optint <- function(object, r = 5){
   x <- object
   est <- round(x$estimates, r)
   se <- round(x$estimates_sd, r)
-  #kl <- x$details$kl_distance
-  #out <- round(x$details$Y_diff, r)
-  #out_sd <- round(x$details$Y_diff_sd, r)
-  #out_t <- out / out_sd
-  #out_p <- 2 * pnorm(abs(out_t), lower.tail = F)
+  kl <- x$details$kl_distance
+  out <- round(x$details$Y_diff, r)
+  out_sd <- round(x$details$Y_diff_sd, r)
+  out_t <- out / out_sd
+  out_p <- 2 * pnorm(abs(out_t), lower.tail = F)
   n <- length(est)
   var_names <- colnames(x$details$new_sample[,1:n])
   coeffs <- matrix(c(est, se), ncol = 2,
                    dimnames = list(var_names, c("Estimate","Std. error")))
-  #out_mat <- matrix(c(out, out_sd, out_t, out_p), ncol = 4,
-  #                    dimnames = list("E(Y|I=1) - E(Y|I=0)",
-  #                                   c("Estimate","Std. error", "t value", "P(>|t|)")))
+  out_mat <- matrix(c(out, out_sd, out_t, out_p), ncol = 4,
+                      dimnames = list("E(Y|I=1) - E(Y|I=0)",
+                                     c("Estimate","Std. error", "t value", "P(>|t|)")))
   method <- x$details$method
   lambda <- x$details$lambda
   cat("Method:", method, ", Lambda =", lambda)
@@ -123,9 +133,9 @@ summary.optint <- function(object, r = 5){
   coef_title <- ifelse(method == "correlations", "Raw Correlations:", "CDF Distances:")
   cat("\n", "\n",coef_title, "\n", "\n")
   print(coeffs)
-  #cat("\n", "The Kullback–Leibler divergence of P(X|I=0) from P(X|I=1) is:", kl, "\n")
-  #cat("\n", "Outcome Difference:", "\n", "\n")
-  #print(out_mat)
+  cat("\n", "The Kullback–Leibler divergence of P(X|I=0) from P(X|I=1) is:", kl, "\n")
+  cat("\n", "Outcome Difference:", "\n", "\n")
+  print(out_mat)
 }
 
 
