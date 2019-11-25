@@ -4,10 +4,10 @@
 \alias{wgt_adjust}
 \title{Weights adjustment}
 \usage{
-wgt_adjust(controls, base.wgt1, wgt, ...)
+wgt_adjust(control, base.wgt1, wgt, ...)
 }
 \arguments{
-\item{controls}{data frame or matrix of factors to control for. these are factors
+\item{control}{data frame or matrix of factors to control for. these are factors
 that we can't consider while looking for the optimal intervention
 (e.g. race).}
 

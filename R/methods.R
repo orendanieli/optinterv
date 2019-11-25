@@ -9,13 +9,13 @@
 #'
 #' @return vector of weights under I = 1
 
-non_parm <- function(Y, X, controls = NULL, wgt = rep(1, length(Y)), lambda = 100, ...){
-  #basline weights (without controls)
+non_parm <- function(Y, X, control = NULL, wgt = rep(1, length(Y)), lambda = 100, ...){
+  #basline weights (without control)
   base_wgt1 <- wgt * Y^(1/lambda)
-  if (is.null(controls)){
+  if (is.null(control)){
     return(base_wgt1)
   } else {
-    return(wgt_adjust(controls, base_wgt1, wgt))
+    return(wgt_adjust(control, base_wgt1, wgt))
   }
 }
 
@@ -27,15 +27,15 @@ non_parm <- function(Y, X, controls = NULL, wgt = rep(1, length(Y)), lambda = 10
 #' @inheritParams optint
 #'
 #' @return vector of adjusted weights under I = 1
-wgt_adjust <- function(controls, base.wgt1, wgt, ...){
-  #add a constant vector to controls
-  controls <- as.matrix(cbind(rep(1, nrow(controls)), controls))
+wgt_adjust <- function(control, base.wgt1, wgt, ...){
+  #add a constant vector to control
+  control <- as.matrix(cbind(rep(1, nrow(control)), control))
   #define function to solve, plug in variables
-  f <- function(b) {dev_moments(b, base.wgt1, controls, wgt)}
+  f <- function(b) {dev_moments(b, base.wgt1, control, wgt)}
   #get solution
-  b0 <- rootSolve::multiroot(f, rep(0,ncol(controls)))$root
+  b0 <- rootSolve::multiroot(f, rep(0,ncol(control)))$root
   #calculate probs with solution
-  wgt1 <- base.wgt1 * exp(controls %*% as.matrix(b0))
+  wgt1 <- base.wgt1 * exp(control %*% as.matrix(b0))
   return(as.vector(wgt1))
 }
 
@@ -46,16 +46,16 @@ wgt_adjust <- function(controls, base.wgt1, wgt, ...){
 #'
 #' @param beta a lagrange multiplier
 #' @param base basline weights
-#' @param controls controls matrix (with a constant)
+#' @param control control matrix (with a constant)
 #' @param wgt original weights
 #'
 #' @return vector of moment deviations
 
-dev_moments <- function(beta, base, controls, wgt, ...){
+dev_moments <- function(beta, base, control, wgt, ...){
   #calculate probs for a given beta
-  p <- base * exp(controls %*% as.matrix(beta))
+  p <- base * exp(control %*% as.matrix(beta))
   #calculate the difference in means between the two distributions
-  dev <- apply(as.vector(p - wgt) * controls, 2, sum)
+  dev <- apply(as.vector(p - wgt) * control, 2, sum)
   return(dev)
 }
 
@@ -68,8 +68,8 @@ dev_moments <- function(beta, base, controls, wgt, ...){
 #'
 #' @return vector of unadjusted weights under I = 1
 
-nn_wgt <- function(Y, X, controls = NULL, wgt = rep(1, length(Y)), lambda = 100, sigma = 1, ...){
-  char_matrix <- cbind(X, controls)
+nn_wgt <- function(Y, X, control = NULL, wgt = rep(1, length(Y)), lambda = 100, sigma = 1, ...){
+  char_matrix <- cbind(X, control)
   vcov <- cov.wt(char_matrix, wgt)$cov
   #find mehalanobis distance for all pairs
   dist <- distances::distances(char_matrix, normalize = vcov)
@@ -101,21 +101,21 @@ nn_wgt <- function(Y, X, controls = NULL, wgt = rep(1, length(Y)), lambda = 100,
 #'
 #' @return vector of adjusted weights under I = 1
 
-nn <- function(Y, X, controls = NULL, wgt = rep(1, length(Y)),
+nn <- function(Y, X, control = NULL, wgt = rep(1, length(Y)),
                lambda = 100, sigma = 1, grp.size = 30, ...){
-  if (is.null(controls)){
+  if (is.null(control)){
     return(nn_wgt(Y, X, wgt = wgt, lambda =  lambda, sigma = sigma))
   }
   #check average size of control groups
-  n_controls <- ncol(controls)
-  #first, transform controls to list:
-  control_list <- lapply(seq_len(n_controls), function(i) controls[,i])
+  n_control <- ncol(control)
+  #first, transform control to list:
+  control_list <- lapply(seq_len(n_control), function(i) control[,i])
   control_val <- lapply(control_list,  unique)
   n_grps <- prod(unlist(lapply(control_val, length)))
   n_obs <- length(Y)
   if (n_obs / n_grps < grp.size){
-    base_wgt1 <- nn_wgt(Y, X, controls, wgt, lambda, sigma)
-    return(wgt_adjust(controls, base_wgt1, wgt))
+    base_wgt1 <- nn_wgt(Y, X, control, wgt, lambda, sigma)
+    return(wgt_adjust(control, base_wgt1, wgt))
   }
   #all possible combinations of control groups:
   control_grps <- expand.grid(control_val)
@@ -125,15 +125,15 @@ nn <- function(Y, X, controls = NULL, wgt = rep(1, length(Y)),
   grp_flag <- NULL
   while(!too_small & comb <= n_grps){
     grp_flag <- cbind(grp_flag, rep(T, n_obs))
-    for(i in 1:n_controls){
-      grp_flag[,comb] <- grp_flag[,comb] & (controls[,i] == control_grps[comb,i])
+    for(i in 1:n_control){
+      grp_flag[,comb] <- grp_flag[,comb] & (control[,i] == control_grps[comb,i])
     }
     too_small <- sum(grp_flag[,comb]) < grp.size
     comb <- comb + 1
   }
   if(too_small){
-    base_wgt1 <- nn_wgt(Y, X, controls, wgt, lambda, sigma)
-    return(wgt_adjust(controls, base_wgt1, wgt))
+    base_wgt1 <- nn_wgt(Y, X, control, wgt, lambda, sigma)
+    return(wgt_adjust(control, base_wgt1, wgt))
   } else {
     #transform grp_flag to list
     grp_flag <- lapply(seq_len(n_grps), function(i) grp_flag[,i])
@@ -151,22 +151,22 @@ nn <- function(Y, X, controls = NULL, wgt = rep(1, length(Y)),
 
 #' Partial Correlation
 #'
-#' Calculates correlation / covariance between Y and X, holding controls constant
+#' Calculates correlation / covariance between Y and X, holding control constant
 #'
 #' @inheritParams optint
 #'
 #' @return data frame with partial correlations & covariance
 
-par_cor = function(Y, X, controls = NULL, wgt = rep(1, length(Y)), ...){
-  if(is.null(controls)){
+par_cor = function(Y, X, control = NULL, wgt = rep(1, length(Y)), ...){
+  if(is.null(control)){
     cors <- as.vector(weights::wtd.cors(X, Y, wgt))
     Y_sd <- sd(Y)
     X_sd <- apply(X, 2, sd)
     return(data.frame(cors, covs = Y_sd * X_sd * cors))
   } else {
-    #residualize controls
-    Y <- lm(Y ~ controls, weights = wgt)$residuals
-    X <- lm(X ~ controls, weights = wgt)$residuals
+    #residualize control
+    Y <- lm(Y ~ control, weights = wgt)$residuals
+    X <- lm(X ~ control, weights = wgt)$residuals
     cors <- as.vector(weights::wtd.cors(X, Y, wgt))
     Y_sd <- sd(Y)
     X_sd <- apply(X, 2, sd)

@@ -4,7 +4,7 @@
 \alias{optint}
 \title{Optimal intervention}
 \usage{
-optint(Y, X, controls = NULL, wgt = rep(1, length(Y)),
+optint(Y, X, control = NULL, wgt = rep(1, length(Y)),
   method = "non-parametric", lambda = 100, sigma = 1,
   grp.size = 30, n.boot = 1000, sign.factor = 2/3, alpha = 0.05,
   n.quant = length(Y)/10, seed = runif(1, 0, .Machine$integer.max),
@@ -15,7 +15,7 @@ optint(Y, X, controls = NULL, wgt = rep(1, length(Y)),
 
 \item{X}{data frame or matrix of factors to be considered.}
 
-\item{controls}{data frame or matrix of factors to control for. these are factors
+\item{control}{data frame or matrix of factors to control for. these are factors
 that we can't consider while looking for the optimal intervention
 (e.g. race).}
 

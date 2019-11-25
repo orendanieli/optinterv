@@ -4,14 +4,14 @@
 \alias{par_cor}
 \title{Partial Correlation}
 \usage{
-par_cor(Y, X, controls = NULL, wgt = rep(1, length(Y)), ...)
+par_cor(Y, X, control = NULL, wgt = rep(1, length(Y)), ...)
 }
 \arguments{
 \item{Y}{outcome vector (must be numeric without NA's).}
 
 \item{X}{data frame or matrix of factors to be considered.}
 
-\item{controls}{data frame or matrix of factors to control for. these are factors
+\item{control}{data frame or matrix of factors to control for. these are factors
 that we can't consider while looking for the optimal intervention
 (e.g. race).}
 
@@ -21,5 +21,5 @@ that we can't consider while looking for the optimal intervention
 data frame with partial correlations & covariance
 }
 \description{
-Calculates correlation / covariance between Y and X, holding controls constant
+Calculates correlation / covariance between Y and X, holding control constant
 }

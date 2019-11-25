@@ -4,7 +4,7 @@
 \alias{nn_wgt}
 \title{Nearest-neighbors weights}
 \usage{
-nn_wgt(Y, X, controls = NULL, wgt = rep(1, length(Y)), lambda = 100,
+nn_wgt(Y, X, control = NULL, wgt = rep(1, length(Y)), lambda = 100,
   sigma = 1, ...)
 }
 \arguments{
@@ -12,7 +12,7 @@ nn_wgt(Y, X, controls = NULL, wgt = rep(1, length(Y)), lambda = 100,
 
 \item{X}{data frame or matrix of factors to be considered.}
 
-\item{controls}{data frame or matrix of factors to control for. these are factors
+\item{control}{data frame or matrix of factors to control for. these are factors
 that we can't consider while looking for the optimal intervention
 (e.g. race).}
 

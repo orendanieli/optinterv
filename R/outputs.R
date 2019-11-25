@@ -87,15 +87,23 @@ wtd_bin <- function(x, n.quant, wgt){
 #'
 #' @return scalar of kullback-liebler divergence.
 
-
-kl_dist.def <- function(wgt, wgt1, ...){
+kl_dist_def <- function(wgt, wgt1, ...){
   #make weights sum to 1
   wgt <- wgt / sum(wgt)
   wgt1 <- wgt1 / sum(wgt1)
   return(sum(wgt1 * log(wgt1 / wgt)))
 }
 
-kl_dist.cor <- function(X, wgt, ni, ...){
+#' Kullback-Leibler Divergence
+#'
+#' Calculates Kullback-Liebler Divergence for two multivariate normal distributions.
+#'
+#' @inheritParams optint
+#' @param ni difference in means (mu1 - mu0)
+#'
+#' @return scalar of kullback-liebler divergence.
+
+kl_dist_cor <- function(X, wgt, ni, ...){
   vcov <- cov.wt(X, wgt)$cov
   return(t(ni) %*% vcov %*% ni)
 }

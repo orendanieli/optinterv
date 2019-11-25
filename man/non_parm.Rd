@@ -4,15 +4,15 @@
 \alias{non_parm}
 \title{Non-parametric method}
 \usage{
-non_parm(Y, X, controls = NULL, wgt = rep(1, length(Y)),
-  lambda = 100, ...)
+non_parm(Y, X, control = NULL, wgt = rep(1, length(Y)), lambda = 100,
+  ...)
 }
 \arguments{
 \item{Y}{outcome vector (must be numeric without NA's).}
 
 \item{X}{data frame or matrix of factors to be considered.}
 
-\item{controls}{data frame or matrix of factors to control for. these are factors
+\item{control}{data frame or matrix of factors to control for. these are factors
 that we can't consider while looking for the optimal intervention
 (e.g. race).}
 
