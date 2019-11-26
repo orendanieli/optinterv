@@ -79,7 +79,12 @@ optint <- function(Y, X,
   estimates_sd <- apply(res$t[,-(n + 1)], 2, sd)
   ci <- boot_ci(res$t[,-(n + 1)], alpha)
   stand_factor <- sd(estimates)
-  new_sample <- cbind(X, control, wgt1)
+  var_names <- colnames(X)
+  if(is.null(var_names)){
+    var_names <- as.character(rep(1:n))
+    colnames(X) <- var_names
+  }
+  new_sample <- cbind(X, control, wgt, wgt1)
   output <- list(estimates = estimates / stand_factor,
                  estimates_sd = estimates_sd / stand_factor,
                  details = list(Y_diff = res$t0[n + 1],
@@ -94,7 +99,7 @@ optint <- function(Y, X,
   if (method == "nearest-neighbors")
     output[["details"]][["sigma"]] <- sigma
   class(output) <- "optint"
-  plot(output)
+  #plot(output)
   return(output)
 }
 
@@ -119,9 +124,6 @@ summary.optint <- function(object, r = 5){
   out_p <- 2 * pnorm(abs(out_t), lower.tail = F)
   n <- length(est)
   var_names <- colnames(x$details$new_sample[,1:n])
-  if(all(nchar(var_names) == 0)){
-    var_names <- as.character(rep(1:n))
-  }
   coeffs <- matrix(c(est, se), ncol = 2,
                    dimnames = list(var_names, c("Estimate","Std. error")))
   out_mat <- matrix(c(out, out_sd, out_t, out_p), ncol = 4,

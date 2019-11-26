@@ -1,3 +1,25 @@
+#' Variable Position
+#'
+#' Find which variables to plot.
+#'
+#' @inheritParams plot.optint
+#' @return vector of variables incidents
+
+var_pos <- function(object, plot.vars = "all"){
+  x <- object
+  n <- length(x$estimates)
+  #estimates positions
+  if(length(plot.vars) == 1){
+    if(plot.vars == "all"){
+      inc <- 1:n
+    }
+  } else {
+    var_names <- colnames(x$details$new_sample[,1:n])
+    inc <- which(var_names %in% plot.vars)
+  }
+  return(inc)
+}
+
 #' Plot optint object
 #'
 #' Produce variables important plot from an optint object.
@@ -13,23 +35,15 @@
 #order variables & deal with negative ci
 plot.optint <- function(object, plot.vars = "all", plot.ci = T, graph.col = 1, ...){
   x <- object
-  n <- length(x$estimates)
-  var_names <- colnames(x$details$new_sample[,1:n])
-  if(all(nchar(var_names) == 0)){
-    var_names <- as.character(rep(1:n))
-  }
-  #estimates positions
-  if(length(plot.vars) == 1){
-    if(plot.vars == "all"){
-      inc <- 1:n
-    }
-  } else {
-    inc <- var_names %in% plot.vars
-    var_names <- plot.vars
-  }
+  inc <- var_pos(x, plot.vars)
   estimates <- x$estimates[inc]
+  var_names <- colnames(x$details$new_sample[,inc])
   #absolute value of point estimates
-  estimates = abs(estimates)
+  estimates <- abs(estimates)
+  #order by magnitude
+  inc <- inc[order(estimates)]
+  estimates <- estimates[inc]
+  var_names <- var_names[inc]
   #decide font size
   fsize <- ifelse(length(inc) > 20, 0.5, 0.9)
   #add sign to name
@@ -40,6 +54,12 @@ plot.optint <- function(object, plot.vars = "all", plot.ci = T, graph.col = 1, .
     #find values for confidence intervals
     low_ci <- x$details$ci[1,inc]
     up_ci <- x$details$ci[2,inc]
+    if(x$details$method == "correlations"){
+      #flip ci for negative estimates
+      neg_est <- x$details$signs[inc] < 0
+      low_ci[neg_est] <- -1 * low_ci[neg_est]
+      up_ci[neg_est] <- -1 * up_ci[neg_est]
+    }
     #plot
     graph_bor <- c(min(min(low_ci), 0), max(up_ci))
     dotchart(estimates, var_names, xlim = graph_bor, pch = 19, cex = fsize,
@@ -58,5 +78,20 @@ plot.optint <- function(object, plot.vars = "all", plot.ci = T, graph.col = 1, .
   #add 0
   abline(v = 0, lty = 2, col = 2)
   #add sample size
-  legend("bottomright", paste0("N = ", nrow(x$details$new_sample)), cex = 0.6 * fsize)
+  legend("bottomright", paste0("N = ", nrow(x$details$new_sample)), cex = 0.8 * fsize)
 }
+
+plot_change <- function(object, plot.vars = "all", plot.ci = T, graph.col = 1, ...){
+  x <- object
+  inc <- var_pos(x, plot.vars)
+  wgt <- x$details$new_sample[,"wgt"]
+  wgt1 <- x$details$new_sample[,"wgt1"]
+  #var_names <- colnames(x$details$new_sample[,inc])
+  par(mfrow = c(length(inc), 2))
+  for(i in inc){
+    plot(density(x$details$new_sample[,i], weights = wgt))
+    plot(density(x$details$new_sample[,i], weights = wgt1))
+  }
+}
+
+
