@@ -13,7 +13,8 @@ Imports:
     rootSolve,
     distances,
     weights,
-    boot
+    boot,
+    lattice
 RoxygenNote: 6.1.1
 Suggests: 
     knitr,

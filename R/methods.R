@@ -155,23 +155,18 @@ nn <- function(Y, X, control = NULL, wgt = rep(1, length(Y)),
 #'
 #' @inheritParams optint
 #'
-#' @return data frame with partial correlations & covariance
+#' @return data frame with partial correlations, partial covariance & p-values.
 
 par_cor = function(Y, X, control = NULL, wgt = rep(1, length(Y)), ...){
-  if(is.null(control)){
-    cors <- as.vector(weights::wtd.cors(X, Y, wgt))
-    Y_sd <- sd(Y)
-    X_sd <- apply(X, 2, sd)
-    return(data.frame(cors, covs = Y_sd * X_sd * cors))
-  } else {
+  Y_sd <- sd(Y)
+  X_sd <- apply(X, 2, sd)
+  if(!is.null(control)){
     #residualize control
     Y <- lm(Y ~ control, weights = wgt)$residuals
     X <- lm(X ~ control, weights = wgt)$residuals
-    cors <- as.vector(weights::wtd.cors(X, Y, wgt))
-    Y_sd <- sd(Y)
-    X_sd <- apply(X, 2, sd)
-    return(data.frame(cors, covs = Y_sd * X_sd * cors))
   }
+  res <- as.data.frame(weights::wtd.cor(X, Y, wgt))
+  return(cbind(covariance = Y_sd * X_sd * res$correlation, res))
 }
 
 

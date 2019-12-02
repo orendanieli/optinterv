@@ -20,7 +20,7 @@
 #' @param sign.factor
 #' @param alpha
 #' @param n.quant
-#'
+#' @param n.perm
 #' @param seed
 #'
 #' @return an optint object.
@@ -37,10 +37,17 @@ optint <- function(Y, X,
                   sign.factor = 2/3,
                   alpha = 0.05,
                   n.quant = length(Y) / 10,
+                  n.perm = 1000,
                   seed = runif(1, 0, .Machine$integer.max),
                   ...){
   validate_data(Y, X, control, wgt)
+  #create var names if missing
   n <- ncol(X)
+  var_names <- colnames(X)
+  if(is.null(var_names)){
+    var_names <- as.character(rep(1:n))
+    colnames(X) <- var_names
+  }
   set.seed(seed)
   if (method != "correlations"){
     #prepare data
@@ -59,32 +66,31 @@ optint <- function(Y, X,
                                lambda =  lambda, sigma = sigma, grp.size = grp.size))
     signs <- apply(X_std, 2, function(v) per_distance(v, n.quant, wgt, wgt1, sign.factor, T))
     kl_distance <- kl_dist_def(wgt, wgt1)
+    estimates <- res$t0[-(n + 1)]
+    p_val <- perm_test(estimates, wgt, wgt1, X, n.quant, n.perm)
   } else {
     boot_func <- function(d, i){
       cor_cov <- par_cor(Y[i], X[i,], control[i,], wgt[i])
-      covs <- cor_cov$covs
-      cors <- cor_cov$cors
-      betas <- lm(Y[i] ~ X[i,] + control[i,], weights = wgt[i])$coefficients
+      covs <- cor_cov$covariance
+      cors <- cor_cov$correlation
+      betas <- lm(Y[i] ~ cbind(X[i,], control[i,]), weights = wgt[i])$coefficients
       diff <- (1/lambda) * (betas[2:(n+1)] %*% covs)
       c(cors, diff)
     }
     res <- boot::boot(1:length(Y), boot_func, n.boot, stype = "i")
-    ni <- (1/lambda) * par_cor(Y, X, control, wgt)$covs
+    point_est <- par_cor(Y, X, control, wgt)
+    ni <- (1/lambda) * point_est$covariance
     kl_distance <- kl_dist_cor(X, wgt, ni)
     X <- t(t(X) + ni)
     wgt1 <- wgt
-    signs <- sign(res$t0[-(n + 1)])
+    estimates <- point_est$correlation
+    signs <- sign(estimates)
+    p_val <- point_est$p.value
   }
-  estimates <- res$t0[-(n + 1)]
   estimates_sd <- apply(res$t[,-(n + 1)], 2, sd)
   ci <- boot_ci(res$t[,-(n + 1)], alpha)
   stand_factor <- sd(estimates)
-  var_names <- colnames(X)
-  if(is.null(var_names)){
-    var_names <- as.character(rep(1:n))
-    colnames(X) <- var_names
-  }
-  new_sample <- cbind(X, control, wgt, wgt1)
+  new_sample <- cbind(X, control, wgt, wgt1) #return also wgt for plot_change()
   output <- list(estimates = estimates / stand_factor,
                  estimates_sd = estimates_sd / stand_factor,
                  details = list(Y_diff = res$t0[n + 1],
@@ -92,6 +98,7 @@ optint <- function(Y, X,
                                 method = method,
                                 lambda = lambda,
                                 signs = signs,
+                                p_value = p_val,
                                 ci = ci / stand_factor,
                                 stand_factor = stand_factor,
                                 kl_distance = kl_distance,
@@ -117,6 +124,7 @@ summary.optint <- function(object, r = 5){
   x <- object
   est <- round(x$estimates, r)
   se <- round(x$estimates_sd, r)
+  p_val <- round(x$details$p_value, r)
   kl <- x$details$kl_distance
   out <- round(x$details$Y_diff, r)
   out_sd <- round(x$details$Y_diff_sd, r)
@@ -124,8 +132,8 @@ summary.optint <- function(object, r = 5){
   out_p <- 2 * pnorm(abs(out_t), lower.tail = F)
   n <- length(est)
   var_names <- colnames(x$details$new_sample[,1:n])
-  coeffs <- matrix(c(est, se), ncol = 2,
-                   dimnames = list(var_names, c("Estimate","Std. error")))
+  coeffs <- matrix(c(est, se, p_val), ncol = 3,
+                   dimnames = list(var_names, c("Estimate","Std. error","P-Value")))
   out_mat <- matrix(c(out, out_sd, out_t, out_p), ncol = 4,
                       dimnames = list("E(Y|I=1) - E(Y|I=0)",
                                      c("Estimate","Std. error", "t value", "P(>|t|)")))

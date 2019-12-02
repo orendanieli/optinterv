@@ -4,9 +4,11 @@ validate_data <- function(Y, X, control, wgt){
     stop(paste("X must be either matrix or data.frame,",
                "with the same number of examples as Y."))
   }
-  if(!inherits(control, c("matrix","data.frame")) | n != nrow(control)){
-    stop(paste("control must be either matrix or data.frame,",
-               "with the same number of examples as Y."))
+  if(!is.null(control)){
+    if(!inherits(control, c("matrix","data.frame")) | n != nrow(control)){
+      stop(paste("control must be either matrix or data.frame,",
+                 "with the same number of examples as Y."))
+    }
   }
   if(!inherits(wgt, "numeric") | n != length(wgt)){
     stop(paste("wgt must be numeric,",

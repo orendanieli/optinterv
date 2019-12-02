@@ -18,7 +18,7 @@ that we can't consider while looking for the optimal intervention
 \item{wgt}{an optional vector of weights.}
 }
 \value{
-data frame with partial correlations & covariance
+data frame with partial correlations, partial covariance & p-values.
 }
 \description{
 Calculates correlation / covariance between Y and X, holding control constant

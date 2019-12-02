@@ -5,13 +5,19 @@
 #' @inheritParams plot.optint
 #' @return vector of variables incidents
 
-var_pos <- function(object, plot.vars = "all"){
+var_pos <- function(object, plot.vars = "all", alpha, ...){
   x <- object
   n <- length(x$estimates)
   #estimates positions
   if(length(plot.vars) == 1){
     if(plot.vars == "all"){
       inc <- 1:n
+    } else {
+      inc <- which(x$details$p_value < alpha)
+      if(length(inc) == 0){
+        inc <- 1
+        warning("There are no significant variables. displays the first variable")
+      }
     }
   } else {
     var_names <- colnames(x$details$new_sample[,1:n])
@@ -30,14 +36,16 @@ var_pos <- function(object, plot.vars = "all"){
 #'                   with variables names to plot.
 #' @param plot.ci logical. if TRUE (default) plot condifendece intervals. Otherwise
 #'                plot only point estimates.
+#' @param alpha significance level. only used if plot.vars = "sig.
 #' @export
 
 #order variables & deal with negative ci
-plot.optint <- function(object, plot.vars = "all", plot.ci = T, graph.col = 1, ...){
+plot.optint <- function(object, plot.vars = "sig", plot.ci = T,
+                        graph.col = 1, alpha = 0.05, ...){
   x <- object
-  inc <- var_pos(x, plot.vars)
+  inc <- var_pos(x, plot.vars, alpha)
   estimates <- x$estimates[inc]
-  var_names <- colnames(x$details$new_sample[,inc])
+  var_names <- colnames(x$details$new_sample)[inc]
   #absolute value of point estimates
   estimates <- abs(estimates)
   #order by magnitude
@@ -81,17 +89,35 @@ plot.optint <- function(object, plot.vars = "all", plot.ci = T, graph.col = 1, .
   legend("bottomright", paste0("N = ", nrow(x$details$new_sample)), cex = 0.8 * fsize)
 }
 
-plot_change <- function(object, plot.vars = "all", plot.ci = T, graph.col = 1, ...){
+plot_change <- function(object, plot.vars = "sig",
+                        graph.col = 1, alpha = 0.05, ...){
   x <- object
-  inc <- var_pos(x, plot.vars)
+  if(x$details$method == "correlations")
+    stop("plot_change() isn't available for the correlations method")
+  inc <- var_pos(x, plot.vars, alpha)
   wgt <- x$details$new_sample[,"wgt"]
   wgt1 <- x$details$new_sample[,"wgt1"]
-  #var_names <- colnames(x$details$new_sample[,inc])
-  par(mfrow = c(length(inc), 2))
+  #make weights sum to 1
+  wgt <- wgt / sum(wgt)
+  wgt1 <- wgt1 / sum(wgt1)
+  wgt_all <- c(wgt, wgt1)
+  var_names <- colnames(x$details$new_sample)[inc]
+  #prepare graph data
+  n <- nrow(x$details$new_sample)
+  gdata <- data.frame(w = wgt_all, inter = c(rep("Before", n), rep("After",n)))
+  n_graphs <- length(inc)
+  count <- 1
+  print(var_names)
   for(i in inc){
-    plot(density(x$details$new_sample[,i], weights = wgt))
-    plot(density(x$details$new_sample[,i], weights = wgt1))
+    gdata <- cbind(var = rep(x$details$new_sample[,i], 2), gdata)
+    graph <- densityplot(~ var, weights = w, groups = inter, data = gdata,
+                         auto_key = T, ylab = "", xlab = var_names[count],
+                         col = c("red", "blue"), plot.points = F)
+    final <- count == n_graphs
+    print(graph, split = c(count, 1, n_graphs, 1), more = !final)
+    count <- count + 1
   }
 }
 
+#legend + histogram
 
