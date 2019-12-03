@@ -38,6 +38,7 @@ optint <- function(Y, X,
                   alpha = 0.05,
                   n.quant = length(Y) / 10,
                   n.perm = 1000,
+                  quick = F,
                   seed = runif(1, 0, .Machine$integer.max),
                   ...){
   validate_data(Y, X, control, wgt)
@@ -69,6 +70,9 @@ optint <- function(Y, X,
     estimates <- res$t0[-(n + 1)]
     p_val <- perm_test(estimates, wgt, wgt1, X, n.quant, n.perm)
   } else {
+    if(!is.matrix(X)){
+      X <- as.matrix(X)
+    }
     boot_func <- function(d, i){
       cor_cov <- par_cor(Y[i], X[i,], control[i,], wgt[i])
       covs <- cor_cov$covariance
@@ -106,9 +110,15 @@ optint <- function(Y, X,
   if (method == "nearest-neighbors")
     output[["details"]][["sigma"]] <- sigma
   class(output) <- "optint"
-  #plot(output)
+  plot(output)
   return(output)
 }
+
+#optint_by_group <- function()
+
+
+
+
 
 
 #' Summary for optint object
