@@ -149,6 +149,9 @@ perm_test <- function(estimates, wgt, wgt1, X, n.quant, n.perm = 1000, ...){
 }
 
 
-
+mean_diff <- function(x, wgt, wgt1){
+  diff <- weighted.mean(x, wgt1) - weighted.mean(x, wgt)
+  return(diff)
+}
 
 

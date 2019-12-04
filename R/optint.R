@@ -41,7 +41,7 @@ optint <- function(Y, X,
                   quick = F,
                   seed = runif(1, 0, .Machine$integer.max),
                   ...){
-  validate_data(Y, X, control, wgt)
+  validate_data(Y, X, control, wgt = wgt)
   #create var names if missing
   n <- ncol(X)
   var_names <- colnames(X)
@@ -58,20 +58,35 @@ optint <- function(Y, X,
     boot_func <- function(d, i){
       w <- do.call(func, list(Y_pos[i], X_std[i,], control[i,], wgt =  wgt[i],
                               lambda =  lambda, sigma = sigma, grp.size = grp.size))
+      if(quick){
+        diff <- apply(X[i,], 2, function(v) mean_diff(v, wgt[i], w))
+        return(diff)
+      }
       dists <- apply(X_std[i,], 2, function(v) per_distance(v, n.quant, wgt[i], w))
       diff <- outcome_diff(Y[i], w, wgt[i])
-      c(dists, diff)
+      return(c(dists, diff))
     }
-    res <- boot::boot(1:length(Y), boot_func, n.boot, stype = "i")
+    #res <- boot::boot(1:length(Y), boot_func, n.boot, stype = "i")
+    #estimates <- res$t0[-(n + 1)]
+    if(quick){
+      estimates_sd <- apply(res$t[,-(n + 1)], 2, sd)
+      return(data.frame(estimates = estimates,
+                        estimates_sd = estimates_sd))
+    }
     wgt1 <- do.call(func, list(Y_pos, X_std, control, wgt =  wgt,
                                lambda =  lambda, sigma = sigma, grp.size = grp.size))
-    signs <- apply(X_std, 2, function(v) per_distance(v, n.quant, wgt, wgt1, sign.factor, T))
-    kl_distance <- kl_dist_def(wgt, wgt1)
-    estimates <- res$t0[-(n + 1)]
+    #signs <- apply(X_std, 2,
+    #               function(v) per_distance(v, n.quant, wgt, wgt1, sign.factor, T))
+    #kl_distance <- kl_dist_def(wgt, wgt1)
+    estimates = apply(X_std, 2, function(v) per_distance(v, n.quant, wgt, wgt1))#
     p_val <- perm_test(estimates, wgt, wgt1, X, n.quant, n.perm)
+    return(p_val)#
   } else {
-    if(!is.matrix(X)){
+    if(!is.matrix(X))
       X <- as.matrix(X)
+    if(quick){
+      corrs <- par_cor(Y, X, control, wgt)
+      return(data.frame(estimates = corrs$correlation, estimated_sd = corrs$std.err))
     }
     boot_func <- function(d, i){
       cor_cov <- par_cor(Y[i], X[i,], control[i,], wgt[i])
@@ -110,11 +125,39 @@ optint <- function(Y, X,
   if (method == "nearest-neighbors")
     output[["details"]][["sigma"]] <- sigma
   class(output) <- "optint"
-  plot(output)
+  plot(output, alpha = alpha)
   return(output)
 }
 
-#optint_by_group <- function()
+optint_by_group <- function(Y, X, group,
+                            control = NULL,
+                            wgt = rep(1, length(Y)),
+                            method = "non-parametric",
+                            lambda = 100,
+                            sigma = 1,
+                            grp.size = 30,
+                            n.boot = 1000,
+                            alpha = 0.05){
+  validate_data(Y, X, control, wgt = wgt)
+  validate_group(group)
+  group_names <- unique(group)
+  estimates <- matrix(NA, nrow = ncol(X), ncol = length(group_names),
+                      dimnames = list(colnames(X), as.character(group_names)))
+  sd <- matrix(NA, nrow = ncol(X), ncol = length(group_names),
+                      dimnames = list(colnames(X), as.character(group_names)))
+  for(g in group_names){
+    gr_inc <- which(group == g)
+    res <- do.call("optint", list(Y[gr_inc], X[gr_inc,], control[gr_inc,],
+                                     wgt[gr_inc], method, lambda, sigma, grp.size,
+                                     n.boot, quick = T))
+    estimates[,paste(g)] <- res$estimates
+    sd[,paste(g)] <- res$estimates_sd
+  }
+  output <- list(est = estimates, sd = sd)
+  class(output) <- "optint_by_group"
+  #plot(output, alpha = alpha)
+  return(output)
+}
 
 
 

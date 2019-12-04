@@ -123,6 +123,7 @@ plot_change <- function(object, plot.vars = "sig",
            text=list(c("Before","After")))
   for(i in inc){
     var <- x$details$new_sample[,i]
+    #for binary variables, plot barchart
     if(all(unique(var) %in% c(0,1))){
       freq_bef <- weighted.mean(var, wgt)
       freq_aft <- weighted.mean(var, wgt1)
@@ -131,6 +132,7 @@ plot_change <- function(object, plot.vars = "sig",
       graph <- lattice::barchart(gdata, stack = T, horizontal = F,
                                  col = graph.col, xlab = var_names[count])
     } else {
+      #for continouous variables, plot densityplot
       var <- rep(var, 2)
       graph <- lattice::densityplot(~ var, weights = wgt_all, groups = interv,
                                     ylab = "", xlab = var_names[count],
@@ -151,7 +153,22 @@ plot_change <- function(object, plot.vars = "sig",
   }
 }
 
-
+plot.optint_by_group <- function(object,
+                                 plot.vars = "sig",
+                                 graph.col = 1,
+                                 alpha = 0.05, ...){
+  est <- object$est
+  sd <- object$sd
+  #max absolute value for each group
+  ext_est <- apply(est, 1, function(x) max(abs(x)))
+  #which group is the max for each var
+  raw.max = apply(vs,1,function(r) r[which.max(abs(r))])
+  #t-state for group differences
+  if (se){
+    #difference divided by SE of the difference
+    tstat = (vs[,1]-vs[,2])/(vse[,1]^2+vse[,2]^2)^0.5
+  }
+}
 
 
 

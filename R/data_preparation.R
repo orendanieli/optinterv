@@ -1,11 +1,11 @@
-validate_data <- function(Y, X, control, wgt){
+validate_data <- function(Y, X, control = NULL, wgt, ...){
   n <- length(Y)
-  if(!inherits(X, c("matrix","data.frame")) | n != nrow(X)){
+  if(!inherits(X, c("matrix","data.frame")) || n != nrow(X)){
     stop(paste("X must be either matrix or data.frame,",
                "with the same number of examples as Y."))
   }
   if(!is.null(control)){
-    if(!inherits(control, c("matrix","data.frame")) | n != nrow(control)){
+    if(!inherits(control, c("matrix","data.frame")) || n != nrow(control)){
       stop(paste("control must be either matrix or data.frame,",
                  "with the same number of examples as Y."))
     }
@@ -14,7 +14,11 @@ validate_data <- function(Y, X, control, wgt){
     stop(paste("wgt must be numeric,",
                "with the same number of examples as Y."))
   }
-  dat <- cbind(Y, X, control, wgt)
+  if(is.null(control)){
+    dat <- cbind(Y, X, wgt)
+  } else {
+    dat <- cbind(Y, X, control, wgt)
+  }
   if(any(is.na(dat))){
     stop("Data contains NA's.")
   }
@@ -30,6 +34,19 @@ prepare_Y <- function(Y){
     Y <- exp(Y)
   }
   return(Y)
+}
+
+validate_group <- function(Y, group){
+  n <- length(Y)
+  p <- length(group)
+  if(!n==p){
+    stop("Different length for Y and group")
+  }
+  num_group <- length(unique(group))
+  if((n / num_group) < 30){
+    warning(paste("number of groups =", num_group,
+                  " ,but only ", n, "observations"))
+  }
 }
 
 
