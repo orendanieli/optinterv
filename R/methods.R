@@ -94,9 +94,6 @@ nn_wgt <- function(Y, X, control = NULL, wgt = rep(1, length(Y)), lambda = 100, 
 #'
 #' Calculates adjusted weights under I = 1, using the nearest-neighbors method
 #'
-#' @param grp.size if number of observations in each control group is smaller than grp.size,
-#'                 perform weights adjustment the same way as with the non-parametric method.
-#'                 else, calculate weights seperatly for each control group.
 #' @inheritParams optint
 #'
 #' @return vector of adjusted weights under I = 1

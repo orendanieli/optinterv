@@ -7,7 +7,7 @@
 wgt_adjust(control, base.wgt1, wgt, ...)
 }
 \arguments{
-\item{control}{data frame or matrix of factors to control for. these are factors
+\item{control}{numeric data frame or matrix of factors to control for. these are factors
 that we can't consider while looking for the optimal intervention
 (e.g. race).}
 

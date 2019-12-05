@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot.R
 \name{plot_change}
 \alias{plot_change}
-\title{Plot change in X distribution}
+\title{Plot the change in the distribution of X}
 \usage{
 plot_change(object, plot.vars = "sig", graph.col = c("lightcoral",
   "cadetblue3"), alpha = 0.05, print.sep = T, line.type = c(1, 2),
@@ -11,17 +11,17 @@ plot_change(object, plot.vars = "sig", graph.col = c("lightcoral",
 \arguments{
 \item{object}{an optint object.}
 
-\item{plot.vars}{which variables to plot? "all" (default) plot all variables and
-"sig" plot only siginficance variables. Another option is vector
- with variables names to plot.}
+\item{plot.vars}{which variables to plot? "all" plot all variables and
+"sig" (default) plot only siginficance variables. Another option is a vector
+ with names of variables to plot.}
 
 \item{graph.col}{graph color/s.}
 
-\item{alpha}{significance level. only used if plot.vars = "sig.}
+\item{alpha}{significance level. only used if plot.vars = "sig".}
 
 \item{print.sep}{logical. If TRUE (default) plot each graph seperatly.
 This option is highly recommended for more then 6 variables.}
 }
 \description{
-Plot denisty or histogram of X, before and after the intervention.
+Plot denisty or barchart of X, before and after the intervention.
 }

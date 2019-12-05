@@ -10,9 +10,9 @@ nn_wgt(Y, X, control = NULL, wgt = rep(1, length(Y)), lambda = 100,
 \arguments{
 \item{Y}{outcome vector (must be numeric without NA's).}
 
-\item{X}{data frame or matrix of factors to be considered.}
+\item{X}{numeric data frame or matrix of factors to be considered.}
 
-\item{control}{data frame or matrix of factors to control for. these are factors
+\item{control}{numeric data frame or matrix of factors to control for. these are factors
 that we can't consider while looking for the optimal intervention
 (e.g. race).}
 

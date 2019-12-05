@@ -4,26 +4,38 @@
 #' a pre-specified outcome, using varius methods.
 #'
 #' @param Y outcome vector (must be numeric without NA's).
-#' @param X data frame or matrix of factors to be considered.
-#' @param control data frame or matrix of factors to control for. these are factors
+#' @param X numeric data frame or matrix of factors to be considered.
+#' @param control numeric data frame or matrix of factors to control for. these are factors
 #'                 that we can't consider while looking for the optimal intervention
 #'                 (e.g. race).
 #' @param wgt an optional vector of weights.
-#' @param method the method to be used. one of "correlation" / "non-parametric" /
+#' @param method the method to be used. either "non-parametric" (default), "correlation" or
 #'               "nearest-neighbors".
 #' @param lambda the lagrange multiplier. also known as the shadow price of an
 #'               intervention.
 #' @param sigma distance penalty for the nearest-neighbors method.
-#' @param grp.size
-#' @param n.boot number of bootstrap replications to use for the standard errors
-#'               calculation.
+#' @param grp.size for the nearest-neighbors method; if the number of examples in each
+#'                 control group is smaller than grp.size, performs weight adjustment
+#'                 using wgt_adjust().else, calculate weights seperatly for each
+#'                 control group.
+#' @param n.boot number of bootstrap replications to use for the standard errors /
+#'               confidence intervals calculation.
+#' @param n.quant number of quantiles to use when calculating CDF distance.
+#' @param alpha significance level for the confidence intervals.
 #' @param sign.factor
-#' @param alpha
-#' @param n.quant
-#' @param n.perm
+#' @param n.perm number of permutations for the permutation test.
 #' @param seed
 #'
-#' @return an optint object.
+#' @return an optint object. this object is a list containing the folowing elements:
+#' \itemize{
+#'  \item estimates - standardized point estimates.
+#'  \item estimates_sd - estimates standard deviation.
+#'  \item details - a list containing further details such as:
+#'
+#' }
+#' In addition, the function \code{\link[Matrix]{summary}} can be used to
+#' print a summary of the results.
+#'
 #' @export
 
 optint <- function(Y, X,

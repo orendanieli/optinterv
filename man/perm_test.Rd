@@ -12,7 +12,9 @@ perm_test(estimates, wgt, wgt1, X, n.quant, n.perm = 1000, ...)
 
 \item{wgt}{an optional vector of weights.}
 
-\item{X}{data frame or matrix of factors to be considered.}
+\item{X}{numeric data frame or matrix of factors to be considered.}
+
+\item{n.quant}{number of quantiles to use when calculating CDF distance.}
 
 \item{n.perm}{number of permutations to permute from wgt1.}
 }

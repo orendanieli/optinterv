@@ -91,6 +91,7 @@ kl_dist_def <- function(wgt, wgt1, ...){
   #make weights sum to 1
   wgt <- wgt / sum(wgt)
   wgt1 <- wgt1 / sum(wgt1)
+  #what about wgt1 == 0
   return(sum(wgt1 * log(wgt1 / wgt)))
 }
 

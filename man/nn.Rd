@@ -10,9 +10,9 @@ nn(Y, X, control = NULL, wgt = rep(1, length(Y)), lambda = 100,
 \arguments{
 \item{Y}{outcome vector (must be numeric without NA's).}
 
-\item{X}{data frame or matrix of factors to be considered.}
+\item{X}{numeric data frame or matrix of factors to be considered.}
 
-\item{control}{data frame or matrix of factors to control for. these are factors
+\item{control}{numeric data frame or matrix of factors to control for. these are factors
 that we can't consider while looking for the optimal intervention
 (e.g. race).}
 
@@ -23,9 +23,10 @@ intervention.}
 
 \item{sigma}{distance penalty for the nearest-neighbors method.}
 
-\item{grp.size}{if number of observations in each control group is smaller than grp.size,
-perform weights adjustment the same way as with the non-parametric method.
-else, calculate weights seperatly for each control group.}
+\item{grp.size}{for the nearest-neighbors method; if the number of examples in each
+control group is smaller than grp.size, performs weight adjustment
+using wgt_adjust().else, calculate weights seperatly for each
+control group.}
 }
 \value{
 vector of adjusted weights under I = 1

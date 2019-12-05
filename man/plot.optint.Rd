@@ -10,16 +10,16 @@
 \arguments{
 \item{object}{an optint object.}
 
-\item{plot.vars}{which variables to plot? "all" (default) plot all variables and
-"sig" plot only siginficance variables. Another option is vector
- with variables names to plot.}
+\item{plot.vars}{which variables to plot? "all" plot all variables and
+"sig" (default) plot only siginficance variables. Another option is a vector
+ with names of variables to plot.}
 
 \item{plot.ci}{logical. if TRUE (default) plot condifendece intervals. Otherwise
 plot only point estimates.}
 
 \item{graph.col}{graph color/s.}
 
-\item{alpha}{significance level. only used if plot.vars = "sig.}
+\item{alpha}{significance level. only used if plot.vars = "sig".}
 }
 \description{
 Produce variables important plot from an optint object.

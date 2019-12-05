@@ -31,13 +31,13 @@ var_pos <- function(object, plot.vars = "sig", alpha, ...){
 #' Produce variables important plot from an optint object.
 #'
 #' @param object an optint object.
-#' @param plot.vars which variables to plot? "all" (default) plot all variables and
-#'                  "sig" plot only siginficance variables. Another option is vector
-#'                   with variables names to plot.
+#' @param plot.vars which variables to plot? "all" plot all variables and
+#'                  "sig" (default) plot only siginficance variables. Another option is a vector
+#'                   with names of variables to plot.
 #' @param plot.ci logical. if TRUE (default) plot condifendece intervals. Otherwise
 #'                plot only point estimates.
 #' @param graph.col graph color/s.
-#' @param alpha significance level. only used if plot.vars = "sig.
+#' @param alpha significance level. only used if plot.vars = "sig".
 #' @export
 
 plot.optint <- function(object, plot.vars = "sig", plot.ci = T,
@@ -88,9 +88,9 @@ plot.optint <- function(object, plot.vars = "sig", plot.ci = T,
   legend("bottomright", paste0("N = ", nrow(x$details$new_sample)))#, cex = 0.8 * fsize)
 }
 
-#' Plot change in X distribution
+#' Plot the change in the distribution of X
 #'
-#' Plot denisty or histogram of X, before and after the intervention.
+#' Plot denisty or barchart of X, before and after the intervention.
 #'
 #' @param print.sep logical. If TRUE (default) plot each graph seperatly.
 #'                  This option is highly recommended for more then 6 variables.

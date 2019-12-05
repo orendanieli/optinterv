@@ -13,15 +13,15 @@ optint(Y, X, control = NULL, wgt = rep(1, length(Y)),
 \arguments{
 \item{Y}{outcome vector (must be numeric without NA's).}
 
-\item{X}{data frame or matrix of factors to be considered.}
+\item{X}{numeric data frame or matrix of factors to be considered.}
 
-\item{control}{data frame or matrix of factors to control for. these are factors
+\item{control}{numeric data frame or matrix of factors to control for. these are factors
 that we can't consider while looking for the optimal intervention
 (e.g. race).}
 
 \item{wgt}{an optional vector of weights.}
 
-\item{method}{the method to be used. one of "correlation" / "non-parametric" /
+\item{method}{the method to be used. either "non-parametric" (default), "correlation" or
 "nearest-neighbors".}
 
 \item{lambda}{the lagrange multiplier. also known as the shadow price of an
@@ -29,13 +29,32 @@ intervention.}
 
 \item{sigma}{distance penalty for the nearest-neighbors method.}
 
-\item{n.boot}{number of bootstrap replications to use for the standard errors
-calculation.}
+\item{grp.size}{for the nearest-neighbors method; if the number of examples in each
+control group is smaller than grp.size, performs weight adjustment
+using wgt_adjust().else, calculate weights seperatly for each
+control group.}
+
+\item{n.boot}{number of bootstrap replications to use for the standard errors /
+confidence intervals calculation.}
+
+\item{alpha}{significance level for the confidence intervals.}
+
+\item{n.quant}{number of quantiles to use when calculating CDF distance.}
+
+\item{n.perm}{number of permutations for the permutation test.}
 
 \item{seed}{}
 }
 \value{
-an optint object.
+an optint object. this object is a list containing the folowing elements:
+\itemize{
+ \item estimates - standardized point estimates.
+ \item estimates_sd - estimates standard deviation.
+ \item details - a list containing further details such as:
+
+}
+In addition, the function \code{\link[Matrix]{summary}} can be used to
+print a summary of the results.
 }
 \description{
 identifies the factors with the greatest potential to increase

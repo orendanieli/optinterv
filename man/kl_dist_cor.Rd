@@ -7,7 +7,7 @@
 kl_dist_cor(X, wgt, ni, ...)
 }
 \arguments{
-\item{X}{data frame or matrix of factors to be considered.}
+\item{X}{numeric data frame or matrix of factors to be considered.}
 
 \item{wgt}{an optional vector of weights.}
 
