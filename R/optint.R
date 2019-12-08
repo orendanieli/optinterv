@@ -26,15 +26,29 @@
 #' @param n.perm number of permutations for the permutation test.
 #' @param seed
 #'
-#' @return an optint object. this object is a list containing the folowing elements:
+#' @return an object of class "optint". This object is a list containing
+#'         the folowing components:
 #' \itemize{
 #'  \item estimates - standardized point estimates.
 #'  \item estimates_sd - estimates standard deviation.
-#'  \item details - a list containing further details such as:
-#'
+#'  \item details - a list containing further details, such as:
+#'  \itemize{
+#'   \item Y_diff
+#'   \item Y_diff_sd
+#'   \item method
+#'   \item lambda
+#'   \item signs
+#'   \item p_value
+#'   \item ci
+#'   \item stand_factor
+#'   \item kl_distance
+#'   \item new_sample
+#'  }
 #' }
 #' In addition, the function \code{\link[Matrix]{summary}} can be used to
 #' print a summary of the results.
+#'
+#' @examples
 #'
 #' @export
 
@@ -140,6 +154,18 @@ optint <- function(Y, X,
   plot(output, alpha = alpha)
   return(output)
 }
+
+#' Optimal intervention, by group
+#'
+#' Similar to \code{\link[optinterv]{optint}}, identifies the factors with the greatest
+#' potential to increase a pre-specified outcome for each group separately, and thus allowing
+#' to detect heterogeneity between groups.
+#'
+#' @param group vector with group labels (i.e. grouping variable). the function
+#'              \code{\link[optinterv]{optint}} implemented for each group separately.
+#' @inheritParams optint
+#' @return
+#' @export
 
 optint_by_group <- function(Y, X, group,
                             control = NULL,

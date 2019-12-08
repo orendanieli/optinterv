@@ -3,4 +3,5 @@
 S3method(plot,optint)
 S3method(summary,optint)
 export(optint)
+export(optint_by_group)
 export(plot_change)
