@@ -9,8 +9,8 @@ var_pos <- function(object, plot.vars = "sig", alpha, ...){
   x <- object
   n <- length(x$estimates)
   #estimates positions
-  if(plot.vars == "all"){
-    inc <- 1:n
+  if(is.numeric(plot.vars)){
+    inc <- 1:plot.vars
   } else {
     if(plot.vars == "sig") {
       inc <- which(x$details$p_value < alpha)
@@ -31,8 +31,8 @@ var_pos <- function(object, plot.vars = "sig", alpha, ...){
 #' Produce variables important plot from an optint object.
 #'
 #' @param object an optint object.
-#' @param plot.vars which variables to plot? "all" plot all variables and
-#'                  "sig" (default) plot only siginficance variables. Another option is a vector
+#' @param plot.vars which variables to plot? either a number - indicating to plot the first n variables,
+#'                  "sig" (default) - plot only siginficance variables, or a vector
 #'                   with names of variables to plot.
 #' @param plot.ci logical. if TRUE (default) plot condifendece intervals. Otherwise
 #'                plot only point estimates.
@@ -139,11 +139,11 @@ plot_change <- function(object, plot.vars = "sig",
                                     col = graph.col, plot.points = T,
                                     key = leg, lwd = 3, lty = line.type)
     }
-    if(print.sep | count == n_graphs){
+    if(print.sep){
       print(graph)
     } else {
       if(count > 4){
-        stop("can't print more than 6 graphs. please set 'print.sep = T'")
+        stop("can't print more than 4 graphs. please set 'print.sep = T'")
       }
       final <- count == n_graphs | count == 4
       tot_col <- min(n_graphs, 4)
@@ -153,12 +153,47 @@ plot_change <- function(object, plot.vars = "sig",
   }
 }
 
+
 plot.optint_by_group <- function(object,
                                  plot.vars = "sig",
                                  graph.col = 1,
                                  alpha = 0.05, ...){
   est <- object$est
   sd <- object$sd
+  n <- length(est)
+  z <- qnorm(1 - (1-alpha) / 2)
+  #confidence intervals:
+  est <- abs(est)
+  lower_ci <- est - sd*z
+  upper_ci <- est + sd*z
+  #which variables to plot?
+  if(is.numeric(plot.vars)){
+    est <- est[,1:plot.vars]
+    lower_ci <- lower_ci[1:plot.vars,]
+    upper_ci <- upper_ci[1:plot.vars,]
+  } else {
+    if(plot.vars == "sig"){
+      #t-state for group differences
+      tstat <- (est[,-1] - est[,-n]) / sqrt(sd[,-1]^2 + sd[,-n]^2)
+      tstat <- abs(tstat)
+      #min tstat by variable
+      tstat_min <- apply(tstat, 1, min)
+      #lower low_ci by variable
+      lower_ci_min <- apply(lower_ci, 1, min)
+      #take variables with significance difference between groups or with at
+      #least one significance group
+      inc <- which((lower_ci_min > 0 | tstat_min > z))
+      est <- est[inc,]
+      lower_ci <- lower_ci[inc,]
+      upper_ci <- upper_ci[inc,]
+    } else {
+      #var names...
+    }
+  }
+
+}
+
+
   #max absolute value for each group
   ext_est <- apply(est, 1, function(x) max(abs(x)))
   #which group is the max for each var

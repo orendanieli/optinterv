@@ -92,8 +92,8 @@ optint <- function(Y, X,
       diff <- outcome_diff(Y[i], w, wgt[i])
       return(c(dists, diff))
     }
-    #res <- boot::boot(1:length(Y), boot_func, n.boot, stype = "i")
-    #estimates <- res$t0[-(n + 1)]
+    res <- boot::boot(1:length(Y), boot_func, n.boot, stype = "i")
+    estimates <- res$t0[-(n + 1)]
     if(quick){
       estimates_sd <- apply(res$t[,-(n + 1)], 2, sd)
       return(data.frame(estimates = estimates,
@@ -101,12 +101,12 @@ optint <- function(Y, X,
     }
     wgt1 <- do.call(func, list(Y_pos, X_std, control, wgt =  wgt,
                                lambda =  lambda, sigma = sigma, grp.size = grp.size))
-    #signs <- apply(X_std, 2,
-    #               function(v) per_distance(v, n.quant, wgt, wgt1, sign.factor, T))
-    #kl_distance <- kl_dist_def(wgt, wgt1)
-    estimates = apply(X_std, 2, function(v) per_distance(v, n.quant, wgt, wgt1))#
+    signs <- apply(X_std, 2,
+                   function(v) per_distance(v, n.quant, wgt, wgt1, sign.factor, T))
+    kl_distance <- kl_dist_def(wgt, wgt1)
+    #estimates = apply(X_std, 2, function(v) per_distance(v, n.quant, wgt, wgt1))#
     p_val <- perm_test(estimates, wgt, wgt1, X, n.quant, n.perm)
-    return(p_val)#
+    #return(p_val)#
   } else {
     if(!is.matrix(X))
       X <- as.matrix(X)
@@ -177,7 +177,7 @@ optint_by_group <- function(Y, X, group,
                             n.boot = 1000,
                             alpha = 0.05){
   validate_data(Y, X, control, wgt = wgt)
-  validate_group(group)
+  validate_group(Y, group)
   group_names <- unique(group)
   estimates <- matrix(NA, nrow = ncol(X), ncol = length(group_names),
                       dimnames = list(colnames(X), as.character(group_names)))
