@@ -153,24 +153,33 @@ plot_change <- function(object, plot.vars = "sig",
   }
 }
 
+#' Plot optint object, by group
+#'
+#' Produce variables important plot from an optint_by_group object.
+#' @inheritParams plot.optint
+#' @export
 
 plot.optint_by_group <- function(object,
                                  plot.vars = "sig",
-                                 graph.col = 1,
+                                 graph.col = NULL,
                                  alpha = 0.05, ...){
   est <- object$est
   sd <- object$sd
-  n <- length(est)
-  z <- qnorm(1 - (1-alpha) / 2)
-  #find which group is the max for each var (will be useful later)
-  var_max <- apply(est, 1, function(x){ x[which.max(abs(x))] })
+  n_group <- ncol(est)
+  if(is.null(graph.col)){
+    graph.col <- seq(2, n_group*2, 2)
+  }
+  z <- qnorm(1 - (alpha / 2))
+  #t-state for group differences
+  tstat <- (est[,-1] - est[,-n_group]) / sqrt(sd[,-1]^2 + sd[,-n_group]^2)
+  tstat <- as.matrix(abs(tstat))
+  #absolut estimates
   est <- abs(est)
   #confidence intervals:
   lower_ci <- est - sd*z
   upper_ci <- est + sd*z
-  #t-state for group differences
-  tstat <- (est[,-1] - est[,-n]) / sqrt(sd[,-1]^2 + sd[,-n]^2)
-  tstat <- abs(tstat)
+  #find which group is the max for each var (will be useful later)
+  var_max <- apply(est, 1, function(x){ x[which.max(abs(x))] })
   #min tstat by variable
   tstat_min <- apply(tstat, 1, min)
   var_names <- row.names(est)
@@ -184,23 +193,61 @@ plot.optint_by_group <- function(object,
       #take variables with significance difference between groups or with at
       #least one significance group
       inc <- which((lower_ci_min > 0 | tstat_min > z))
+      if(length(inc) == 0){
+        inc <- 1
+        warning(paste("There are no variables with significance difference",
+                      "between groups or with at least one significance group.",
+                      "displays the first variable"))
+      }
     } else {
       inc <- which(var_names %in% plot.vars)
     }
   }
-  #drop unnecessary variables:
-  est <- est[inc,]
-  var_max[inc]
-  lower_ci <- lower_ci[inc,]
-  upper_ci <- upper_ci[inc,]
+  var_names <- var_names[inc]
+  var_max <- var_max[inc]
   tstat_min <- tstat_min[inc]
   #sign is based on the higher point estimate
   sgn <- sign(var_max)
   var_names <- paste0(var_names, ifelse(sgn > 0, " (+)", " (-)"))
   #add star if at least one difference is significant
   var_names <- paste0(ifelse(tstat_min > z, "*", ""), var_names)
-
+  #sort to put the highest values first
+  inc <- inc[order(var_max, decreasing = T)]
+  #go back to original estimates (not absolut):
+  est <- object$est[inc,]
+  sd <- sd[inc,]
+  #if est & sd are vectors, transform them to matrix
+  n_vars <- length(inc)
+  if(n_vars == 1){
+    est <- t(as.matrix(est))
+    sd <- t(as.matrix(sd))
+  }
+  #normalize to SD units
+  stand_factor <- sd(est)
+  lower_ci <- (est - sd*z) / stand_factor
+  upper_ci <- (est + sd*z) / stand_factor
+  est <- est / stand_factor
+  #borders of graph to display, to include all CI
+  x_lim <- c(min(lower_ci), max(upper_ci))
+  print(x_lim)
+  #decide font size
+  fsize <- ifelse(n_vars  > 20, 0.5, 0.9)
+  #empty plot with correct borders
+  dotchart(rep(80, n_vars), var_names[inc],
+           pch = 19, cex = fsize, col = 1,
+           col.axis = 2,
+           xlim = x_lim)
+  #add points  and CIs
+  for (j in 1:n_group){
+    #soem ofset to get the groups not on top of each other
+    ofst <- (j - 1) / (2 * n_group)
+    points(est[,j], (1:n_vars) - ofst, col = graph.col[j],
+                       pch = 19, cex = fsize)
+  }
 }
+
+
+
 
 
 

@@ -181,8 +181,7 @@ optint_by_group <- function(Y, X, group,
   group_names <- unique(group)
   estimates <- matrix(NA, nrow = ncol(X), ncol = length(group_names),
                       dimnames = list(colnames(X), as.character(group_names)))
-  sd <- matrix(NA, nrow = ncol(X), ncol = length(group_names),
-                      dimnames = list(colnames(X), as.character(group_names)))
+  sd <- estimates
   for(g in group_names){
     gr_inc <- which(group == g)
     res <- do.call("optint", list(Y[gr_inc], X[gr_inc,], control[gr_inc,],

@@ -10,8 +10,8 @@
 \arguments{
 \item{object}{an optint object.}
 
-\item{plot.vars}{which variables to plot? "all" plot all variables and
-"sig" (default) plot only siginficance variables. Another option is a vector
+\item{plot.vars}{which variables to plot? either a number - indicating to plot the first n variables,
+"sig" (default) - plot only siginficance variables, or a vector
  with names of variables to plot.}
 
 \item{plot.ci}{logical. if TRUE (default) plot condifendece intervals. Otherwise
