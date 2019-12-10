@@ -162,48 +162,48 @@ plot.optint_by_group <- function(object,
   sd <- object$sd
   n <- length(est)
   z <- qnorm(1 - (1-alpha) / 2)
-  #confidence intervals:
+  #find which group is the max for each var (will be useful later)
+  var_max <- apply(est, 1, function(x){ x[which.max(abs(x))] })
   est <- abs(est)
+  #confidence intervals:
   lower_ci <- est - sd*z
   upper_ci <- est + sd*z
+  #t-state for group differences
+  tstat <- (est[,-1] - est[,-n]) / sqrt(sd[,-1]^2 + sd[,-n]^2)
+  tstat <- abs(tstat)
+  #min tstat by variable
+  tstat_min <- apply(tstat, 1, min)
+  var_names <- row.names(est)
   #which variables to plot?
   if(is.numeric(plot.vars)){
-    est <- est[,1:plot.vars]
-    lower_ci <- lower_ci[1:plot.vars,]
-    upper_ci <- upper_ci[1:plot.vars,]
+    inc <- 1:plot.vars
   } else {
     if(plot.vars == "sig"){
-      #t-state for group differences
-      tstat <- (est[,-1] - est[,-n]) / sqrt(sd[,-1]^2 + sd[,-n]^2)
-      tstat <- abs(tstat)
-      #min tstat by variable
-      tstat_min <- apply(tstat, 1, min)
       #lower low_ci by variable
       lower_ci_min <- apply(lower_ci, 1, min)
       #take variables with significance difference between groups or with at
       #least one significance group
       inc <- which((lower_ci_min > 0 | tstat_min > z))
-      est <- est[inc,]
-      lower_ci <- lower_ci[inc,]
-      upper_ci <- upper_ci[inc,]
     } else {
-      #var names...
+      inc <- which(var_names %in% plot.vars)
     }
   }
+  #drop unnecessary variables:
+  est <- est[inc,]
+  var_max[inc]
+  lower_ci <- lower_ci[inc,]
+  upper_ci <- upper_ci[inc,]
+  tstat_min <- tstat_min[inc]
+  #sign is based on the higher point estimate
+  sgn <- sign(var_max)
+  var_names <- paste0(var_names, ifelse(sgn > 0, " (+)", " (-)"))
+  #add star if at least one difference is significant
+  var_names <- paste0(ifelse(tstat_min > z, "*", ""), var_names)
 
 }
 
 
-  #max absolute value for each group
-  ext_est <- apply(est, 1, function(x) max(abs(x)))
-  #which group is the max for each var
-  raw.max = apply(vs,1,function(r) r[which.max(abs(r))])
-  #t-state for group differences
-  if (se){
-    #difference divided by SE of the difference
-    tstat = (vs[,1]-vs[,2])/(vse[,1]^2+vse[,2]^2)^0.5
-  }
-}
+
 
 
 
