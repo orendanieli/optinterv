@@ -14,7 +14,7 @@ optint_by_group(Y, X, group, control = NULL, wgt = rep(1, length(Y)),
 \item{X}{numeric data frame or matrix of factors to be considered.}
 
 \item{group}{vector with group labels (i.e. grouping variable). the function
-\code{\link[optinterv]{optint}} implemented for each group separately.}
+\code{\link{optint}} implemented for each group separately.}
 
 \item{control}{numeric data frame or matrix of factors to control for. these are factors
 that we can't consider while looking for the optimal intervention
@@ -32,16 +32,24 @@ intervention.}
 
 \item{grp.size}{for the nearest-neighbors method; if the number of examples in each
 control group is smaller than grp.size, performs weight adjustment
-using wgt_adjust().else, calculate weights seperatly for each
-control group.}
+using \code{\link[optinterv]{wgt_adjust}}. else,
+calculate weights seperatly for each control group.}
 
 \item{n.boot}{number of bootstrap replications to use for the standard errors /
 confidence intervals calculation.}
 
 \item{alpha}{significance level for the confidence intervals.}
 }
+\value{
+an object of class "optint_by_group". This object is a list containing
+        two components:
+ \item{est}{a matrix of estimates (in their original units), for each group.
+            here estimates are \eqn{E(X | I=1) - E(X | I=0)}, and they are
+            used by \code{\link{plot.optint_by_group}}.}
+ \item{sd}{estimates standard deviation.}
+}
 \description{
-Similar to \code{\link[optinterv]{optint}}, identifies the factors with the greatest
+Similar to \code{\link{optint}}, identifies the factors with the greatest
 potential to increase a pre-specified outcome for each group separately, and thus allowing
 to detect heterogeneity between groups.
 }

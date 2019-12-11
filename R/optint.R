@@ -16,35 +16,41 @@
 #' @param sigma distance penalty for the nearest-neighbors method.
 #' @param grp.size for the nearest-neighbors method; if the number of examples in each
 #'                 control group is smaller than grp.size, performs weight adjustment
-#'                 using wgt_adjust().else, calculate weights seperatly for each
-#'                 control group.
+#'                 using \code{\link[optinterv]{wgt_adjust}}. else,
+#'                 calculate weights seperatly for each control group.
 #' @param n.boot number of bootstrap replications to use for the standard errors /
 #'               confidence intervals calculation.
-#' @param n.quant number of quantiles to use when calculating CDF distance.
+#' @param sign.factor what proportion of quantiles should to be increased (decreased)
+#'                    in order to return a positive (negative) sign? not relevant for
+#'                    the correlation method (there the correlation sign is returned).
 #' @param alpha significance level for the confidence intervals.
-#' @param sign.factor
+#' @param n.quant number of quantiles to use when calculating CDF distance.
 #' @param n.perm number of permutations for the permutation test.
-#' @param seed
+#' @param quick logical. if TRUE, returns only \eqn{E(X | I=1) - E(X | I=0)} as an estimate.
+#'              this estimate is used by \code{\link{optint_by_group}}.
+#' @param plot logical. if TRUE (default), the results are plotted by \code{\link{plot.optint}}.
+#' @param seed the seed of the random number generator.
 #'
 #' @return an object of class "optint". This object is a list containing
 #'         the folowing components:
-#' \itemize{
-#'  \item estimates - standardized point estimates.
-#'  \item estimates_sd - estimates standard deviation.
-#'  \item details - a list containing further details, such as:
+#'  \item{estimates}{standardized point estimates (correlations for the
+#'  correlation method and cdf distances otherwise).}
+#'  \item{estimates_sd}{estimates standard deviation.}
+#'  \item{details}{a list containing further details, such as:}
 #'  \itemize{
-#'   \item Y_diff
-#'   \item Y_diff_sd
-#'   \item method
-#'   \item lambda
-#'   \item signs
-#'   \item p_value
-#'   \item ci
-#'   \item stand_factor
-#'   \item kl_distance
-#'   \item new_sample
+#'   \item Y_diff - \eqn{E(Y | I=1) - E(Y | I=0)}.
+#'   \item Y_diff_sd - standard deviation for Y_diff.
+#'   \item method - the method used.
+#'   \item lambda - the lagrange multiplier used.
+#'   \item signs - signs (i.e. directions) for the estimates.
+#'   \item p_value - p-values for the estimates.
+#'   \item ci - a matrix of confidence intervals for the estimates.
+#'   \item stand_factor - the standardization factor used to standardize the results.
+#'   \item kl_distance - the Kullback–Leibler divergence of \eqn{P(X | I=0) from P(X | I=1)}.
+#'   \item new_sample - a data frame containing X, control (if provided),
+#'         wgt (the original weights) and wgt1 (the new weights under \eqn{I = 1}.)
 #'  }
-#' }
+#'
 #' In addition, the function \code{\link[Matrix]{summary}} can be used to
 #' print a summary of the results.
 #'
@@ -65,6 +71,7 @@ optint <- function(Y, X,
                   n.quant = length(Y) / 10,
                   n.perm = 1000,
                   quick = F,
+                  plot = T,
                   seed = runif(1, 0, .Machine$integer.max),
                   ...){
   validate_data(Y, X, control, wgt = wgt)
@@ -151,20 +158,29 @@ optint <- function(Y, X,
   if (method == "nearest-neighbors")
     output[["details"]][["sigma"]] <- sigma
   class(output) <- "optint"
-  plot(output, alpha = alpha)
+  if(plot){
+    plot(output, alpha = alpha)
+  }
   return(output)
 }
 
 #' Optimal intervention, by group
 #'
-#' Similar to \code{\link[optinterv]{optint}}, identifies the factors with the greatest
+#' Similar to \code{\link{optint}}, identifies the factors with the greatest
 #' potential to increase a pre-specified outcome for each group separately, and thus allowing
 #' to detect heterogeneity between groups.
 #'
 #' @param group vector with group labels (i.e. grouping variable). the function
-#'              \code{\link[optinterv]{optint}} implemented for each group separately.
+#'              \code{\link{optint}} implemented for each group separately.
 #' @inheritParams optint
-#' @return
+#'
+#' @return an object of class "optint_by_group". This object is a list containing
+#'         two components:
+#'  \item{est}{a matrix of estimates (in their original units), for each group.
+#'             here estimates are \eqn{E(X | I=1) - E(X | I=0)}, and they are
+#'             used by \code{\link{plot.optint_by_group}}.}
+#'  \item{sd}{estimates standard deviation.}
+#'
 #' @export
 
 optint_by_group <- function(Y, X, group,
@@ -179,9 +195,16 @@ optint_by_group <- function(Y, X, group,
   validate_data(Y, X, control, wgt = wgt)
   validate_group(Y, group)
   group_names <- unique(group)
-  estimates <- matrix(NA, nrow = ncol(X), ncol = length(group_names),
-                      dimnames = list(colnames(X), as.character(group_names)))
+  var_names <- colnames(X)
+  n_vars <- ncol(X)
+  if(is.null(var_names)){
+    var_names <- as.character(rep(1:n_vars))
+  }
+  #initialize empty matrixs for the output:
+  estimates <- matrix(NA, nrow = n_vars, ncol = length(group_names),
+                      dimnames = list(var_names, as.character(group_names)))
   sd <- estimates
+  #implement optint() for each group separately.
   for(g in group_names){
     gr_inc <- which(group == g)
     res <- do.call("optint", list(Y[gr_inc], X[gr_inc,], control[gr_inc,],
@@ -192,7 +215,7 @@ optint_by_group <- function(Y, X, group,
   }
   output <- list(est = estimates, sd = sd)
   class(output) <- "optint_by_group"
-  #plot(output, alpha = alpha)
+  plot(output, alpha = alpha)
   return(output)
 }
 
@@ -203,10 +226,10 @@ optint_by_group <- function(Y, X, group,
 
 #' Summary for optint object
 #'
-#' Report results from an optint object
+#' Report results from an optint object.
 #'
-#' @param object an optint object
-#' @param r number of decimal places to use
+#' @param object an optint object.
+#' @param r number of decimal places to use.
 #'
 #' @export
 
@@ -222,6 +245,8 @@ summary.optint <- function(object, r = 5){
   out_p <- 2 * pnorm(abs(out_t), lower.tail = F)
   n <- length(est)
   var_names <- colnames(x$details$new_sample[,1:n])
+  #add signs to var names:
+  var_names <- add_sign(var_names, x$details$signs)
   coeffs <- matrix(c(est, se, p_val), ncol = 3,
                    dimnames = list(var_names, c("Estimate","Std. error","P-Value")))
   out_mat <- matrix(c(out, out_sd, out_t, out_p), ncol = 4,

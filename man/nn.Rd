@@ -25,8 +25,8 @@ intervention.}
 
 \item{grp.size}{for the nearest-neighbors method; if the number of examples in each
 control group is smaller than grp.size, performs weight adjustment
-using wgt_adjust().else, calculate weights seperatly for each
-control group.}
+using \code{\link[optinterv]{wgt_adjust}}. else,
+calculate weights seperatly for each control group.}
 }
 \value{
 vector of adjusted weights under I = 1

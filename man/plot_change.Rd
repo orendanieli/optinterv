@@ -12,15 +12,16 @@ plot_change(object, plot.vars = "sig", graph.col = c("lightcoral",
 \item{object}{an optint object.}
 
 \item{plot.vars}{which variables to plot? either a number - indicating to plot the first n variables,
-"sig" (default) - plot only siginficance variables, or a vector
+"sig" (default) - plot only significant  variables, or a vector
  with names of variables to plot.}
 
 \item{graph.col}{graph color/s.}
 
-\item{alpha}{significance level. only used if plot.vars = "sig".}
+\item{alpha}{significance level for the confidence intervals. also
+used in order to determine which variables are significant.}
 
 \item{print.sep}{logical. If TRUE (default) plot each graph seperatly.
-This option is highly recommended for more then 6 variables.}
+This option is highly recommended for more than 4 variables.}
 }
 \description{
 Plot denisty or barchart of X, before and after the intervention.

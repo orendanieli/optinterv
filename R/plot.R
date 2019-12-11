@@ -1,3 +1,14 @@
+#' Add signs to variable names
+#'
+#' @param names vector of variable names.
+#' @param signs vector of signs (the same length as names).
+add_sign <- function(names, signs){
+  sgn_symbol <- ifelse(signs > 0, " (+)", ifelse(signs < 0, " (-)", " (±)"))
+  var_names <- paste0(names, sgn_symbol)
+  return(var_names)
+}
+
+
 #' Variable Position
 #'
 #' Find which variables to plot.
@@ -32,12 +43,13 @@ var_pos <- function(object, plot.vars = "sig", alpha, ...){
 #'
 #' @param object an optint object.
 #' @param plot.vars which variables to plot? either a number - indicating to plot the first n variables,
-#'                  "sig" (default) - plot only siginficance variables, or a vector
+#'                  "sig" (default) - plot only significant  variables, or a vector
 #'                   with names of variables to plot.
-#' @param plot.ci logical. if TRUE (default) plot condifendece intervals. Otherwise
+#' @param plot.ci logical. if TRUE (default) plot confidence intervals. Otherwise
 #'                plot only point estimates.
 #' @param graph.col graph color/s.
-#' @param alpha significance level. only used if plot.vars = "sig".
+#' @param alpha significance level for the confidence intervals. also
+#'              used in order to determine which variables are significant.
 #' @export
 
 plot.optint <- function(object, plot.vars = "sig", plot.ci = T,
@@ -54,9 +66,7 @@ plot.optint <- function(object, plot.vars = "sig", plot.ci = T,
   #decide font size
   fsize <- ifelse(length(inc) > 20, 0.5, 0.9)
   #add sign to name
-  sgn <- x$details$signs[inc]
-  sgn_symbol <- ifelse(sgn > 0, " (+)", ifelse(sgn < 0, " (-)", " (±)"))
-  var_names <- paste0(var_names, sgn_symbol)
+  var_names <- add_sign(var_names, x$details$signs[inc])
   if(plot.ci){
     #find values for confidence intervals
     low_ci <- x$details$ci[1,inc]
@@ -93,7 +103,7 @@ plot.optint <- function(object, plot.vars = "sig", plot.ci = T,
 #' Plot denisty or barchart of X, before and after the intervention.
 #'
 #' @param print.sep logical. If TRUE (default) plot each graph seperatly.
-#'                  This option is highly recommended for more then 6 variables.
+#'                  This option is highly recommended for more than 4 variables.
 #' @param line.type
 #' @inheritParams plot.optint
 #' @export
@@ -156,6 +166,8 @@ plot_change <- function(object, plot.vars = "sig",
 #' Plot optint object, by group
 #'
 #' Produce variables important plot from an optint_by_group object.
+#'
+#' @param object an optint_by_group object.
 #' @inheritParams plot.optint
 #' @export
 
@@ -208,11 +220,12 @@ plot.optint_by_group <- function(object,
   tstat_min <- tstat_min[inc]
   #sign is based on the higher point estimate
   sgn <- sign(var_max)
-  var_names <- paste0(var_names, ifelse(sgn > 0, " (+)", " (-)"))
+  #add sign to name
+  var_names <- add_sign(var_names, sgn)
   #add star if at least one difference is significant
   var_names <- paste0(ifelse(tstat_min > z, "*", ""), var_names)
   #sort to put the highest values first
-  inc <- inc[order(var_max, decreasing = T)]
+  inc <- inc[order(var_max)]
   #go back to original estimates (not absolut):
   est <- object$est[inc,]
   sd <- sd[inc,]
@@ -229,7 +242,6 @@ plot.optint_by_group <- function(object,
   est <- est / stand_factor
   #borders of graph to display, to include all CI
   x_lim <- c(min(lower_ci), max(upper_ci))
-  print(x_lim)
   #decide font size
   fsize <- ifelse(n_vars  > 20, 0.5, 0.9)
   #empty plot with correct borders
@@ -243,7 +255,17 @@ plot.optint_by_group <- function(object,
     ofst <- (j - 1) / (2 * n_group)
     points(est[,j], (1:n_vars) - ofst, col = graph.col[j],
                        pch = 19, cex = fsize)
+    #add CIs
+    for (i in 1:n_vars){
+      lines(x = c(lower_ci[i,j], upper_ci[i]), y = c(i,i) - ofst,
+            col = graph.col[j])
+    }
   }
+  #add legend
+  group_names <- colnames(est)
+  legend("bottomright", group_names, col = graph.col, pch = 19, cex = 1)
+  #add vertical line at 0
+  abline(v = 0, lty = 2)
 }
 
 

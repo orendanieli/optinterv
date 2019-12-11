@@ -7,10 +7,10 @@
 \method{summary}{optint}(object, r = 5)
 }
 \arguments{
-\item{object}{an optint object}
+\item{object}{an optint object.}
 
-\item{r}{number of decimal places to use}
+\item{r}{number of decimal places to use.}
 }
 \description{
-Report results from an optint object
+Report results from an optint object.
 }

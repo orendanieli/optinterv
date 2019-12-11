@@ -5,18 +5,19 @@
 \title{Plot optint object, by group}
 \usage{
 \method{plot}{optint_by_group}(object, plot.vars = "sig",
-  graph.col = 1, alpha = 0.05, ...)
+  graph.col = NULL, alpha = 0.05, ...)
 }
 \arguments{
-\item{object}{an optint object.}
+\item{object}{an optint_by_group object.}
 
 \item{plot.vars}{which variables to plot? either a number - indicating to plot the first n variables,
-"sig" (default) - plot only siginficance variables, or a vector
+"sig" (default) - plot only significant  variables, or a vector
  with names of variables to plot.}
 
 \item{graph.col}{graph color/s.}
 
-\item{alpha}{significance level. only used if plot.vars = "sig".}
+\item{alpha}{significance level for the confidence intervals. also
+used in order to determine which variables are significant.}
 }
 \description{
 Produce variables important plot from an optint_by_group object.

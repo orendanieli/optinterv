@@ -11,15 +11,16 @@
 \item{object}{an optint object.}
 
 \item{plot.vars}{which variables to plot? either a number - indicating to plot the first n variables,
-"sig" (default) - plot only siginficance variables, or a vector
+"sig" (default) - plot only significant  variables, or a vector
  with names of variables to plot.}
 
-\item{plot.ci}{logical. if TRUE (default) plot condifendece intervals. Otherwise
+\item{plot.ci}{logical. if TRUE (default) plot confidence intervals. Otherwise
 plot only point estimates.}
 
 \item{graph.col}{graph color/s.}
 
-\item{alpha}{significance level. only used if plot.vars = "sig".}
+\item{alpha}{significance level for the confidence intervals. also
+used in order to determine which variables are significant.}
 }
 \description{
 Produce variables important plot from an optint object.
