@@ -191,7 +191,8 @@ optint_by_group <- function(Y, X, group,
                             sigma = 1,
                             grp.size = 30,
                             n.boot = 1000,
-                            alpha = 0.05){
+                            alpha = 0.05,
+                            plot = TRUE){
   validate_data(Y, X, control, wgt = wgt)
   validate_group(Y, group)
   group_names <- unique(group)
@@ -215,7 +216,9 @@ optint_by_group <- function(Y, X, group,
   }
   output <- list(est = estimates, sd = sd)
   class(output) <- "optint_by_group"
-  plot(output, alpha = alpha)
+  if(plot){
+    plot(output, alpha = alpha)
+  }
   return(output)
 }
 

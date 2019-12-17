@@ -21,13 +21,14 @@ non_parm <- function(Y, X, control = NULL, wgt = rep(1, length(Y)), lambda = 100
 
 #' Weights adjustment
 #'
-#' Adjust new weights so that the distribution of the control variables doesn't change
+#' Adjust new weights so that the distribution of the control variables would not change
 #'
 #' @param base.wgt1 baseline weights under I = 1
 #' @inheritParams optint
 #'
 #' @return vector of adjusted weights under I = 1
 wgt_adjust <- function(control, base.wgt1, wgt, ...){
+  control <- as.matrix(control)
   #add a constant vector to control
   control <- as.matrix(cbind(rep(1, nrow(control)), control))
   #define function to solve, plug in variables
@@ -64,14 +65,16 @@ dev_moments <- function(beta, base, control, wgt, ...){
 #'
 #' Calculates unadjusted weights under I = 1, using the nearest-neighbors method
 #'
+#' @param test if TRUE, returns weights matrix (only used for testing).
 #' @inheritParams optint
 #'
 #' @return vector of unadjusted weights under I = 1
 
-nn_wgt <- function(Y, X, control = NULL, wgt = rep(1, length(Y)), lambda = 100, sigma = 1, ...){
+nn_wgt <- function(Y, X, control = NULL, wgt = rep(1, length(Y)),
+                   lambda = 100, sigma = 1, test = F, ...){
   char_matrix <- cbind(X, control)
   vcov <- cov.wt(char_matrix, wgt)$cov
-  #find mehalanobis distance for all pairs
+  #calculate mehalanobis distance for all pairs
   dist <- distances::distances(char_matrix, normalize = vcov)
   dist <- as.matrix(dist)
   #log weights matrix (log is for precision)
@@ -79,6 +82,10 @@ nn_wgt <- function(Y, X, control = NULL, wgt = rep(1, length(Y)), lambda = 100, 
   #make max 100 for precision
   lwgt_mat <- lwgt_mat - max(lwgt_mat) + 100
   wgt_mat <- exp(lwgt_mat)
+  #return weight matrix for testing
+  if(test){
+    return(wgt_mat)
+  }
   #now make wgt_mat_ij sum to wgt for every column (i) (j is the raw index)
   #first, make each column (i) sum to 1
   si <- apply(wgt_mat, 2, sum)
@@ -103,6 +110,7 @@ nn <- function(Y, X, control = NULL, wgt = rep(1, length(Y)),
   if (is.null(control)){
     return(nn_wgt(Y, X, wgt = wgt, lambda =  lambda, sigma = sigma))
   }
+  control <- as.matrix(control)
   #check average size of control groups
   n_control <- ncol(control)
   #first, transform control to list:

@@ -19,5 +19,5 @@ that we can't consider while looking for the optimal intervention
 vector of adjusted weights under I = 1
 }
 \description{
-Adjust new weights so that the distribution of the control variables doesn't change
+Adjust new weights so that the distribution of the control variables would not change
 }

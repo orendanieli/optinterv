@@ -5,7 +5,7 @@
 \title{Nearest-neighbors weights}
 \usage{
 nn_wgt(Y, X, control = NULL, wgt = rep(1, length(Y)), lambda = 100,
-  sigma = 1, ...)
+  sigma = 1, test = F, ...)
 }
 \arguments{
 \item{Y}{outcome vector (must be numeric without NA's).}
@@ -22,6 +22,8 @@ that we can't consider while looking for the optimal intervention
 intervention.}
 
 \item{sigma}{distance penalty for the nearest-neighbors method.}
+
+\item{test}{if TRUE, returns weights matrix (only used for testing).}
 }
 \value{
 vector of unadjusted weights under I = 1

@@ -10,9 +10,12 @@
 \arguments{
 \item{object}{an optint_by_group object.}
 
-\item{plot.vars}{which variables to plot? either a number - indicating to plot the first n variables,
-"sig" (default) - plot only significant  variables, or a vector
- with names of variables to plot.}
+\item{plot.vars}{which variables to plot? either a number (n) -
+indicating to plot the first n variables,
+"sig" (default) - plot only significant variables
+(here significant means that variabe is signifcant for
+at least one group, or that there is significant heterogeneity),
+or a vector with names of variables to plot.}
 
 \item{graph.col}{graph color/s.}
 
@@ -20,5 +23,5 @@
 used in order to determine which variables are significant.}
 }
 \description{
-Produce variables important plot from an optint_by_group object.
+Produce variables importance plot from an optint_by_group object.
 }

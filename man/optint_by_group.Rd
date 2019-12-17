@@ -6,7 +6,7 @@
 \usage{
 optint_by_group(Y, X, group, control = NULL, wgt = rep(1, length(Y)),
   method = "non-parametric", lambda = 100, sigma = 1,
-  grp.size = 30, n.boot = 1000, alpha = 0.05)
+  grp.size = 30, n.boot = 1000, alpha = 0.05, plot = TRUE)
 }
 \arguments{
 \item{Y}{outcome vector (must be numeric without NA's).}
@@ -39,6 +39,8 @@ calculate weights seperatly for each control group.}
 confidence intervals calculation.}
 
 \item{alpha}{significance level for the confidence intervals.}
+
+\item{plot}{logical. if TRUE (default), the results are plotted by \code{\link{plot.optint}}.}
 }
 \value{
 an object of class "optint_by_group". This object is a list containing

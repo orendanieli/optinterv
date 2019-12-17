@@ -10,6 +10,25 @@ vars     <- matrix(2 * runif(n * p), n, p)
 controls <- 3 * matrix(runif(n * j), n, j)
 outcome  <- rnorm(n) + apply(controls, 1, sum) + vars[,1]
 
+test_that("log weights are linear in log original weights, wage,
+          and controls (non-parametric method)", {
+  dat <- as.data.frame(controls)
+  dat$lwgt1 <- log(non_parm(outcome, vars, controls))
+  dat$lwgt <-log(rep(1, n))
+  dat$ly <- log(outcome)
+  reg <- lm(ly ~ ., dat)
+  reg_sum <- tryCatch(summary(reg),
+                      warning = function(w){suppressWarnings(summary(reg))})
+  expect_true(reg_sum$r.squared >.9999)
+})
+
+#test_that("log weights are linear in log original weights, wage,
+#          and controls (nearest-neighbors method)", {
+
+#  wgt_mat <- nn_wgt(outcome, vars, controls, test = T)
+
+#})
+
 test_that("controls weren't changed using the non-parametric method", {
   #calculate means
   wgt1 <- non_parm(outcome, vars, controls)
@@ -69,7 +88,7 @@ test_that("nearest-neighbors method returns reasonable weights", {
   outcome  <- 5 + rnorm(n) + control[,1] + x[,1]
   char_mat <- cbind(x, control)
   vcov <- cov.wt(char_mat)$cov
-  #find mehalanobis distance for all pairs
+  #calculate mehalanobis distance for all pairs
   dist <- distances::distances(char_mat, normalize = vcov)
   dist <- as.matrix(dist)
   #find representative observation
@@ -78,3 +97,13 @@ test_that("nearest-neighbors method returns reasonable weights", {
   wgt1 <- nn(outcome, x, control)
   expect_equal(p > 0.5, wgt1[rep_obs] > 1)
 })
+
+
+
+
+
+
+
+
+
+

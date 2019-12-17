@@ -11,7 +11,8 @@ plot_change(object, plot.vars = "sig", graph.col = c("lightcoral",
 \arguments{
 \item{object}{an optint object.}
 
-\item{plot.vars}{which variables to plot? either a number - indicating to plot the first n variables,
+\item{plot.vars}{which variables to plot? either a number (n) -
+indicating to plot the first n variables,
 "sig" (default) - plot only significant  variables, or a vector
  with names of variables to plot.}
 

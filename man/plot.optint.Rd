@@ -10,7 +10,8 @@
 \arguments{
 \item{object}{an optint object.}
 
-\item{plot.vars}{which variables to plot? either a number - indicating to plot the first n variables,
+\item{plot.vars}{which variables to plot? either a number (n) -
+indicating to plot the first n variables,
 "sig" (default) - plot only significant  variables, or a vector
  with names of variables to plot.}
 
@@ -23,5 +24,5 @@ plot only point estimates.}
 used in order to determine which variables are significant.}
 }
 \description{
-Produce variables important plot from an optint object.
+Produce variable importance plot from an optint object.
 }

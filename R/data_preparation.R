@@ -37,6 +37,9 @@ prepare_Y <- function(Y){
 }
 
 validate_group <- function(Y, group){
+  if(!is.vector(group)){
+    stop("'group' must be a vector")
+  }
   n <- length(Y)
   p <- length(group)
   if(!n==p){

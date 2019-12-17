@@ -39,10 +39,11 @@ var_pos <- function(object, plot.vars = "sig", alpha, ...){
 
 #' Plot optint object
 #'
-#' Produce variables important plot from an optint object.
+#' Produce variable importance plot from an optint object.
 #'
 #' @param object an optint object.
-#' @param plot.vars which variables to plot? either a number - indicating to plot the first n variables,
+#' @param plot.vars which variables to plot? either a number (n) -
+#'                  indicating to plot the first n variables,
 #'                  "sig" (default) - plot only significant  variables, or a vector
 #'                   with names of variables to plot.
 #' @param plot.ci logical. if TRUE (default) plot confidence intervals. Otherwise
@@ -130,7 +131,7 @@ plot_change <- function(object, plot.vars = "sig",
   #edit legend (for densityplot)
   leg <- list(space="top",
            lines=list(col=graph.col,  lty=line.type),
-           text=list(c("Before","After")))
+           text=list(c("After","Before")))
   for(i in inc){
     var <- x$details$new_sample[,i]
     #for binary variables, plot barchart
@@ -143,8 +144,11 @@ plot_change <- function(object, plot.vars = "sig",
                                  col = graph.col, xlab = var_names[count])
     } else {
       #for continouous variables, plot densityplot
+      #graph boarders:
+      x_lim <- c(min(var), max(var))
       var <- rep(var, 2)
-      graph <- lattice::densityplot(~ var, weights = wgt_all, groups = interv,
+      graph <- lattice::densityplot(~ var, weights = wgt_all,
+                                    groups = interv, xlim = x_lim,
                                     ylab = "", xlab = var_names[count],
                                     col = graph.col, plot.points = T,
                                     key = leg, lwd = 3, lty = line.type)
@@ -165,9 +169,15 @@ plot_change <- function(object, plot.vars = "sig",
 
 #' Plot optint object, by group
 #'
-#' Produce variables important plot from an optint_by_group object.
+#' Produce variables importance plot from an optint_by_group object.
 #'
 #' @param object an optint_by_group object.
+#' @param plot.vars which variables to plot? either a number (n) -
+#'                  indicating to plot the first n variables,
+#'                  "sig" (default) - plot only significant variables
+#'                  (here significant means that variabe is signifcant for
+#'                  at least one group, or that there is significant heterogeneity),
+#'                  or a vector with names of variables to plot.
 #' @inheritParams plot.optint
 #' @export
 
@@ -185,13 +195,13 @@ plot.optint_by_group <- function(object,
   #t-state for group differences
   tstat <- (est[,-1] - est[,-n_group]) / sqrt(sd[,-1]^2 + sd[,-n_group]^2)
   tstat <- as.matrix(abs(tstat))
+  #find which group is the max for each var (will be useful later)
+  var_max <- apply(est, 1, function(x){ x[which.max(abs(x))] })
   #absolut estimates
   est <- abs(est)
   #confidence intervals:
   lower_ci <- est - sd*z
   upper_ci <- est + sd*z
-  #find which group is the max for each var (will be useful later)
-  var_max <- apply(est, 1, function(x){ x[which.max(abs(x))] })
   #min tstat by variable
   tstat_min <- apply(tstat, 1, min)
   var_names <- row.names(est)
@@ -225,7 +235,7 @@ plot.optint_by_group <- function(object,
   #add star if at least one difference is significant
   var_names <- paste0(ifelse(tstat_min > z, "*", ""), var_names)
   #sort to put the highest values first
-  inc <- inc[order(var_max)]
+  inc <- inc[order(abs(var_max))]
   #go back to original estimates (not absolut):
   est <- object$est[inc,]
   sd <- sd[inc,]
@@ -257,7 +267,7 @@ plot.optint_by_group <- function(object,
                        pch = 19, cex = fsize)
     #add CIs
     for (i in 1:n_vars){
-      lines(x = c(lower_ci[i,j], upper_ci[i]), y = c(i,i) - ofst,
+      lines(x = c(lower_ci[i,j], upper_ci[i,j]), y = c(i,i) - ofst,
             col = graph.col[j])
     }
   }
