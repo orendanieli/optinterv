@@ -13,9 +13,9 @@ outcome_diff <- function(Y, wgt1, wgt = rep(1, length(Y))){
   return(Y1 - Y0)
 }
 
-#' Distance Between Distribution
+#' Distance Between Distributions
 #'
-#' Calculate distance in RMSE between quantiles of distribution
+#' Calculate distance in RMSE between quantiles of distributions
 #'
 #' @param x variable.
 #' @param n.quant number of quantiles.
@@ -91,8 +91,9 @@ kl_dist_def <- function(wgt, wgt1, ...){
   #make weights sum to 1
   wgt <- wgt / sum(wgt)
   wgt1 <- wgt1 / sum(wgt1)
-  #what about wgt1 == 0
-  return(sum(wgt1 * log(wgt1 / wgt)))
+  #if wgt1 == 0, the contribution of the corresponding term is 0.
+  lratio <- ifelse(wgt1 == 0, 0, log(wgt1 / wgt))
+  return(sum(wgt1 * lratio))
 }
 
 #' Kullback-Leibler Divergence
@@ -120,13 +121,14 @@ kl_dist_cor <- function(X, wgt, ni, ...){
 
 boot_ci <- function(boot.res, alpha = 0.05){
   quant <- alpha / 2
-  apply(boot.res, 2, function(x){quantile(x, probs = c(quant, 1 - quant))})
+  ci <- apply(boot.res, 2, function(x){quantile(x, probs = c(quant, 1 - quant))})
+  return(ci)
 }
 
 
-#'Permutation test
+#' Permutation test
 
-#'Test the null hypothesis P(X|I=0) = P(X|I=1), using permutation test.
+#' Test the null hypothesis P(X|I=0) = P(X|I=1), using permutation test.
 
 #' @param estimates point estimates of the percentile distance between P(X|I=0) & P(X|I=1).
 #' @param n.perm number of permutations to permute from wgt1.

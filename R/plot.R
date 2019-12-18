@@ -75,8 +75,8 @@ plot.optint <- function(object, plot.vars = "sig", plot.ci = T,
     if(x$details$method == "correlations"){
       #flip ci for negative estimates
       neg_est <- x$details$signs[inc] < 0
-      low_ci[neg_est] <- -1 * low_ci[neg_est]
-      up_ci[neg_est] <- -1 * up_ci[neg_est]
+      up_ci[neg_est] <- -1 * low_ci[neg_est]
+      low_ci[neg_est] <- -1 * up_ci[neg_est]
     }
     #plot
     graph_bor <- c(min(min(low_ci), 0), max(up_ci))

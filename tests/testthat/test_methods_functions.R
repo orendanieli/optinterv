@@ -12,22 +12,42 @@ outcome  <- rnorm(n) + apply(controls, 1, sum) + vars[,1]
 
 test_that("log weights are linear in log original weights, wage,
           and controls (non-parametric method)", {
+  #add weights:
+  w <- 1 + rgeom(n, 0.5)
   dat <- as.data.frame(controls)
-  dat$lwgt1 <- log(non_parm(outcome, vars, controls))
-  dat$lwgt <-log(rep(1, n))
+  dat$lwgt1 <- log(non_parm(outcome, vars, controls, w))
+  dat$lwgt <-log(w)
   dat$ly <- log(outcome)
-  reg <- lm(ly ~ ., dat)
+  reg <- lm(lwgt1 ~ ., dat)
   reg_sum <- tryCatch(summary(reg),
                       warning = function(w){suppressWarnings(summary(reg))})
   expect_true(reg_sum$r.squared >.9999)
 })
 
-#test_that("log weights are linear in log original weights, wage,
-#          and controls (nearest-neighbors method)", {
-
-#  wgt_mat <- nn_wgt(outcome, vars, controls, test = T)
-
-#})
+test_that("log weights are linear in log original weights, wage,
+          and controls (nearest-neighbors method)", {
+  #add weights:
+  w <- 1 + rgeom(n, 0.5)
+  #calculate mehalanobis distance for all pairs
+  char_mat <- cbind(vars, controls)
+  vcov <- cov.wt(char_mat, wt = w)$cov
+  dist <- distances::distances(char_mat, normalize = vcov)
+  dist <- as.matrix(dist)
+  #find representative observation
+  wgt_mat <- nn_wgt(outcome, vars, controls, w, test = T)
+  rep_obs <- which.max(as.vector(apply(wgt_mat, 2, median)))
+  #check linearity
+  dat <- data.frame(row.names = 1:n)
+  dat$lwgt1 <- log(wgt_mat[,rep_obs])
+  dat$lwgt <- log(w)
+  dat$ly <- log(outcome)
+  dat$dst2 <- dist[,rep_obs]^2
+  #run a regression only on large values. lower values could be bad for rounding errors
+  reg <- lm(lwgt1 ~ ., dat, wgt_mat[,rep_obs] > 10^-12)
+  reg_sum <- tryCatch(summary(reg),
+                      warning = function(w){suppressWarnings(summary(reg))})
+  expect_true(reg_sum$r.squared >.9999)
+})
 
 test_that("controls weren't changed using the non-parametric method", {
   #calculate means
@@ -94,7 +114,7 @@ test_that("nearest-neighbors method returns reasonable weights", {
   #find representative observation
   rep_obs <- which.min(as.vector(apply(dist, 2, median)))
   p <- sum(outcome < outcome[rep_obs]) / n
-  wgt1 <- nn(outcome, x, control)
+  wgt1 <- nn(outcome, x, control, lambda = 1, sigma = 100)
   expect_equal(p > 0.5, wgt1[rep_obs] > 1)
 })
 

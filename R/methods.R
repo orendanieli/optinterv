@@ -110,7 +110,6 @@ nn <- function(Y, X, control = NULL, wgt = rep(1, length(Y)),
   if (is.null(control)){
     return(nn_wgt(Y, X, wgt = wgt, lambda =  lambda, sigma = sigma))
   }
-  control <- as.matrix(control)
   #check average size of control groups
   n_control <- ncol(control)
   #first, transform control to list:
@@ -165,6 +164,7 @@ nn <- function(Y, X, control = NULL, wgt = rep(1, length(Y)),
 par_cor = function(Y, X, control = NULL, wgt = rep(1, length(Y)), ...){
   Y_sd <- sd(Y)
   X_sd <- apply(X, 2, sd)
+  control <- as.matrix(control)
   if(!is.null(control)){
     #residualize control
     Y <- lm(Y ~ control, weights = wgt)$residuals

@@ -2,7 +2,7 @@
 % Please edit documentation in R/outputs.R
 \name{per_distance}
 \alias{per_distance}
-\title{Distance Between Distribution}
+\title{Distance Between Distributions}
 \usage{
 per_distance(x, n.quant, wgt, wgt1, p = 2/3, plot.sign = F, ...)
 }
@@ -25,5 +25,5 @@ scalar for distance. If sign = TRUE, returns +1 (-1) for increasing (decreasing)
         p of quantiles. Else returns 0
 }
 \description{
-Calculate distance in RMSE between quantiles of distribution
+Calculate distance in RMSE between quantiles of distributions
 }

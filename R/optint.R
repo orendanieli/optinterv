@@ -25,12 +25,12 @@
 #'                    the correlation method (there the correlation sign is returned).
 #' @param alpha significance level for the confidence intervals.
 #' @param n.quant number of quantiles to use when calculating CDF distance.
+#' @param perm.test logical. if TRUE (default) performs permutation test and calculates p-values.
 #' @param n.perm number of permutations for the permutation test.
 #' @param quick logical. if TRUE, returns only \eqn{E(X | I=1) - E(X | I=0)} as an estimate.
 #'              this estimate is used by \code{\link{optint_by_group}}.
 #' @param plot logical. if TRUE (default), the results are plotted by \code{\link{plot.optint}}.
 #' @param seed the seed of the random number generator.
-#'
 #' @return an object of class "optint". This object is a list containing
 #'         the folowing components:
 #'  \item{estimates}{standardized point estimates (correlations for the
@@ -69,6 +69,7 @@ optint <- function(Y, X,
                   sign.factor = 2/3,
                   alpha = 0.05,
                   n.quant = length(Y) / 10,
+                  perm.test = T,
                   n.perm = 1000,
                   quick = F,
                   plot = T,
@@ -88,21 +89,24 @@ optint <- function(Y, X,
     X_std <- apply(X, 2, function(x, w = wgt){x / sqrt(Hmisc::wtd.var(x, w))})
     Y_pos <- prepare_Y(Y)
     func <- ifelse(method == "non-parametric", "non_parm", "nn")
+    #create bootstrap function
     boot_func <- function(d, i){
-      w <- do.call(func, list(Y_pos[i], X_std[i,], control[i,], wgt =  wgt[i],
-                              lambda =  lambda, sigma = sigma, grp.size = grp.size))
+      w <- do.call(func, list(Y_pos[i], X_std[i,,drop = F], control[i,,drop = F],
+                              wgt =  wgt[i], lambda =  lambda, sigma = sigma,
+                              grp.size = grp.size))
       if(quick){
-        diff <- apply(X[i,], 2, function(v) mean_diff(v, wgt[i], w))
+        diff <- apply(X[i,,drop = F], 2, function(v) mean_diff(v, wgt[i], w))
         return(diff)
       }
-      dists <- apply(X_std[i,], 2, function(v) per_distance(v, n.quant, wgt[i], w))
+      dists <- apply(X_std[i,,drop = F], 2,
+                     function(v) per_distance(v, n.quant, wgt[i], w))
       diff <- outcome_diff(Y[i], w, wgt[i])
       return(c(dists, diff))
     }
     res <- boot::boot(1:length(Y), boot_func, n.boot, stype = "i")
     estimates <- res$t0[-(n + 1)]
     if(quick){
-      estimates_sd <- apply(res$t[,-(n + 1)], 2, sd)
+      estimates_sd <- apply(res$t[,-(n + 1), drop = F], 2, sd)
       return(data.frame(estimates = estimates,
                         estimates_sd = estimates_sd))
     }
@@ -112,17 +116,24 @@ optint <- function(Y, X,
                    function(v) per_distance(v, n.quant, wgt, wgt1, sign.factor, T))
     kl_distance <- kl_dist_def(wgt, wgt1)
     #estimates = apply(X_std, 2, function(v) per_distance(v, n.quant, wgt, wgt1))#
-    p_val <- perm_test(estimates, wgt, wgt1, X, n.quant, n.perm)
+    if(perm.test){
+      p_val <- perm_test(estimates, wgt, wgt1, X, n.quant, n.perm)
+    } else {
+      p_val <- rep(NA, n)
+    }
     #return(p_val)#
   } else {
-    if(!is.matrix(X))
-      X <- as.matrix(X)
+    #correlations method
+    #transform to matrix for lm:
+    X <- as.matrix(X)
+    control <- as.matrix(control)
     if(quick){
       corrs <- par_cor(Y, X, control, wgt)
       return(data.frame(estimates = corrs$correlation, estimated_sd = corrs$std.err))
     }
+    #create bootstrap function
     boot_func <- function(d, i){
-      cor_cov <- par_cor(Y[i], X[i,], control[i,], wgt[i])
+      cor_cov <- par_cor(Y[i], X[i,,drop = F], control[i,,drop = F], wgt[i])
       covs <- cor_cov$covariance
       cors <- cor_cov$correlation
       betas <- lm(Y[i] ~ cbind(X[i,], control[i,]), weights = wgt[i])$coefficients
@@ -139,9 +150,10 @@ optint <- function(Y, X,
     signs <- sign(estimates)
     p_val <- point_est$p.value
   }
-  estimates_sd <- apply(res$t[,-(n + 1)], 2, sd)
-  ci <- boot_ci(res$t[,-(n + 1)], alpha)
-  stand_factor <- sd(estimates)
+  estimates_sd <- apply(res$t[,-(n + 1), drop = F], 2, sd)
+  ci <- boot_ci(res$t[,-(n + 1), drop = F], alpha)
+  #we dont need standardization factor if we have only one variable
+  stand_factor <- ifelse(n == 1, 1, sd(estimates))
   new_sample <- cbind(X, control, wgt, wgt1) #return also wgt for plot_change()
   output <- list(estimates = estimates / stand_factor,
                  estimates_sd = estimates_sd / stand_factor,
