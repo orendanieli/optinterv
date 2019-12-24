@@ -68,7 +68,7 @@ optint <- function(Y, X,
                   n.boot = 1000,
                   sign.factor = 2/3,
                   alpha = 0.05,
-                  n.quant = length(Y) / 10,
+                  n.quant = floor(length(Y) / 10),
                   perm.test = T,
                   n.perm = 1000,
                   quick = F,
@@ -83,6 +83,7 @@ optint <- function(Y, X,
     var_names <- as.character(rep(1:n))
     colnames(X) <- var_names
   }
+  X <- as.matrix(X)
   set.seed(seed)
   if (method != "correlations"){
     #prepare data
@@ -117,7 +118,7 @@ optint <- function(Y, X,
     kl_distance <- kl_dist_def(wgt, wgt1)
     #estimates = apply(X_std, 2, function(v) per_distance(v, n.quant, wgt, wgt1))#
     if(perm.test){
-      p_val <- perm_test(estimates, wgt, wgt1, X, n.quant, n.perm)
+      p_val <- perm_test(estimates, wgt, wgt1, X_std, n.quant, n.perm)
     } else {
       p_val <- rep(NA, n)
     }
@@ -125,7 +126,6 @@ optint <- function(Y, X,
   } else {
     #correlations method
     #transform to matrix for lm:
-    X <- as.matrix(X)
     control <- as.matrix(control)
     if(quick){
       corrs <- par_cor(Y, X, control, wgt)
@@ -239,46 +239,6 @@ optint_by_group <- function(Y, X, group,
 
 
 
-#' Summary for optint object
-#'
-#' Report results from an optint object.
-#'
-#' @param object an optint object.
-#' @param r number of decimal places to use.
-#'
-#' @export
-
-summary.optint <- function(object, r = 5){
-  x <- object
-  est <- round(x$estimates, r)
-  se <- round(x$estimates_sd, r)
-  p_val <- round(x$details$p_value, r)
-  kl <- x$details$kl_distance
-  out <- round(x$details$Y_diff, r)
-  out_sd <- round(x$details$Y_diff_sd, r)
-  out_t <- out / out_sd
-  out_p <- 2 * pnorm(abs(out_t), lower.tail = F)
-  n <- length(est)
-  var_names <- colnames(x$details$new_sample[,1:n])
-  #add signs to var names:
-  var_names <- add_sign(var_names, x$details$signs)
-  coeffs <- matrix(c(est, se, p_val), ncol = 3,
-                   dimnames = list(var_names, c("Estimate","Std. error","P-Value")))
-  out_mat <- matrix(c(out, out_sd, out_t, out_p), ncol = 4,
-                      dimnames = list("E(Y|I=1) - E(Y|I=0)",
-                                     c("Estimate","Std. error", "t value", "P(>|t|)")))
-  method <- x$details$method
-  lambda <- x$details$lambda
-  cat("Method:", method, ", Lambda =", lambda)
-  if (method == "nearest-neighbors")
-    cat(", Sigma =", x$details$sigma)
-  coef_title <- ifelse(method == "correlations", "Raw Correlations:", "CDF Distances:")
-  cat("\n", "\n",coef_title, "\n", "\n")
-  print(coeffs)
-  cat("\n", "The Kullback–Leibler divergence of P(X|I=0) from P(X|I=1) is:", kl, "\n")
-  cat("\n", "Outcome Difference:", "\n", "\n")
-  print(out_mat)
-}
 
 
 

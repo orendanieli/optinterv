@@ -62,7 +62,7 @@ plot.optint <- function(object, plot.vars = "sig", plot.ci = T,
   estimates <- abs(estimates)
   #order by magnitude
   inc <- inc[order(estimates)]
-  estimates <- x$estimates[inc]
+  estimates <- estimates[order(estimates)]
   var_names <- colnames(x$details$new_sample)[inc]
   #decide font size
   fsize <- ifelse(length(inc) > 20, 0.5, 0.9)

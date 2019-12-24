@@ -140,14 +140,15 @@ perm_test <- function(estimates, wgt, wgt1, X, n.quant, n.perm = 1000, ...){
   n <- length(wgt1)
   p <- ncol(X)
   #permute 'n.perm' permutations from wgt1
-  perm_w1 <- sapply(1:n.perm, function(x){sample(wgt1, size = n, replace = F)})
+  perm_w1 <- replicate(n.perm, sample(wgt1, n, replace = F))
   #for each variable, calculate per_distance for each permutation.
-  dist_sample <- matrix(nrow = n.perm, ncol = p)
+  p_val <- rep(NA, p)
   for (i in 1:p){
-    dist_sample[,i] <- apply(perm_w1, 2, function(w1){per_distance(X[,i], n.quant, wgt, w1)})
+    dist_sample <- apply(perm_w1, 2,
+                             function(w1){per_distance(X[,i], n.quant, wgt, w1)})
+    #calculate P(estimate < dist_sample) (=p value)
+    p_val[i] <- mean(estimates[i] < dist_sample)
   }
-  #calculate P(estimate < dist_sample) (=p value)
-  p_val <- sapply(1:p, function(j){mean(estimates[j] < dist_sample[,j])})
   return(p_val)
 }
 
