@@ -84,12 +84,14 @@ optint <- function(Y, X,
     colnames(X) <- var_names
   }
   X <- as.matrix(X)
+  #replace "method" with its abbreviation (crr / nn- / nr-)
+  method <- as.character(abbreviate(method, 3))
   set.seed(seed)
-  if (method != "correlations"){
+  if (method != "crr"){
     #prepare data
     X_std <- apply(X, 2, function(x, w = wgt){x / sqrt(Hmisc::wtd.var(x, w))})
     Y_pos <- prepare_Y(Y)
-    func <- ifelse(method == "non-parametric", "non_parm", "nn")
+    func <- ifelse(method == "nn-", "non_parm", "nn")
     #create bootstrap function
     boot_func <- function(d, i){
       w <- do.call(func, list(Y_pos[i], X_std[i,,drop = F], control[i,,drop = F],
@@ -126,7 +128,9 @@ optint <- function(Y, X,
   } else {
     #correlations method
     #transform to matrix for lm:
-    control <- as.matrix(control)
+    if(!is.null(control)){
+      control <- as.matrix(control)
+    }
     if(quick){
       corrs <- par_cor(Y, X, control, wgt)
       return(data.frame(estimates = corrs$correlation, estimated_sd = corrs$std.err))
@@ -167,7 +171,7 @@ optint <- function(Y, X,
                                 stand_factor = stand_factor,
                                 kl_distance = kl_distance,
                                 new_sample = new_sample))
-  if (method == "nearest-neighbors")
+  if (method == "nr-")
     output[["details"]][["sigma"]] <- sigma
   class(output) <- "optint"
   if(plot){

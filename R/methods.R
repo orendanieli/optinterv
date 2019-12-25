@@ -164,7 +164,6 @@ nn <- function(Y, X, control = NULL, wgt = rep(1, length(Y)),
 par_cor = function(Y, X, control = NULL, wgt = rep(1, length(Y)), ...){
   Y_sd <- sd(Y)
   X_sd <- apply(X, 2, sd)
-  control <- as.matrix(control)
   if(!is.null(control)){
     #residualize control
     Y <- lm(Y ~ control, weights = wgt)$residuals

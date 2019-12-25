@@ -27,6 +27,9 @@ validate_data <- function(Y, X, control = NULL, wgt, ...){
                "For categorical variables, please use 1/0 encoding",
                "(see ?model.matrix for further details)"))
   }
+  if(min(Y) < 0){
+    message("Assume Y is in log units (since it includes negative values)")
+  }
 }
 
 prepare_Y <- function(Y){

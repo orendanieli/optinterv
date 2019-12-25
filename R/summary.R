@@ -29,6 +29,8 @@ summary.optint <- function(object, r = 5){
                     dimnames = list("E(Y|I=1) - E(Y|I=0)",
                                     c("Estimate","Std. error", "t value", "P(>|t|)")))
   method <- x$details$method
+  method <- ifelse(method == "crr", "correlations",
+                   ifelse(method == "nn-", "non-parametric", "nearest-neighbors"))
   lambda <- x$details$lambda
   cat("Method:", method, ", Lambda =", lambda)
   if (method == "nearest-neighbors")
@@ -37,8 +39,9 @@ summary.optint <- function(object, r = 5){
   cat("\n", "\n",coef_title, "\n", "\n")
   print(as.data.frame(coeffs))
   cat("\n", "The Kullback–Leibler divergence of P(X|I=0) from P(X|I=1) is:", kl, "\n")
-  cat("\n", "Outcome Difference:", "\n", "\n")
+  cat("\n", "Outcome Difference (excluding zeros):", "\n", "\n")
   print(out_mat)
+  cat("\n", "Note: Y is in log units")
 }
 
 

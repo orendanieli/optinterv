@@ -8,6 +8,11 @@
 #' @return outcome difference
 #'
 outcome_diff <- function(Y, wgt1, wgt = rep(1, length(Y))){
+  if(min(Y) >= 0){
+    #transform to log scale
+    Y <- Y[Y>0]
+    Y <- log(Y)
+  }
   Y0 <- weighted.mean(Y, wgt)
   Y1 <- weighted.mean(Y, wgt1)
   return(Y1 - Y0)
