@@ -10,7 +10,10 @@
 outcome_diff <- function(Y, wgt1, wgt = rep(1, length(Y))){
   if(min(Y) >= 0){
     #transform to log scale
-    Y <- Y[Y>0]
+    pos_ind <- Y > 0
+    Y <- Y[pos_ind]
+    wgt <- wgt[pos_ind]
+    wgt1 <- wgt1[pos_ind]
     Y <- log(Y)
   }
   Y0 <- weighted.mean(Y, wgt)
@@ -142,15 +145,15 @@ boot_ci <- function(boot.res, alpha = 0.05){
 #' @return vector of p values.
 
 perm_test <- function(estimates, wgt, wgt1, X, n.quant, n.perm = 1000, ...){
-  n <- length(wgt1)
+  n <- nrow(X)
   p <- ncol(X)
-  #permute 'n.perm' permutations from wgt1
-  perm_w1 <- replicate(n.perm, sample(wgt1, n, replace = F))
+  #permute 'n.perm' permutations from X rows index
+  perm_rows <- replicate(n.perm, sample(1:n, n, replace = F))
   #for each variable, calculate per_distance for each permutation.
   p_val <- rep(NA, p)
   for (i in 1:p){
-    dist_sample <- apply(perm_w1, 2,
-                             function(w1){per_distance(X[,i], n.quant, wgt, w1)})
+    dist_sample <- apply(perm_rows, 2,
+                             function(r){per_distance(X[r,i], n.quant, wgt, wgt1)})
     #calculate P(estimate < dist_sample) (=p value)
     p_val[i] <- mean(estimates[i] < dist_sample)
   }

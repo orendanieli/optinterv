@@ -90,13 +90,16 @@ plot.optint <- function(object, plot.vars = "sig", plot.ci = T,
       j <- j + 1
     }
   } else {
-    dotchart(estimates, var_names, xlim = c(0, max(estimates)), pch = 19, cex = fsize,
+    dotchart(estimates, var_names, xlim = c(0, max(estimates)), pch = 19,
+             cex = fsize,
              col = .col, col.axis = 2)
   }
   #add 0
   abline(v = 0, lty = 2, col = 2)
   #add sample size
-  legend("bottomright", paste0("N = ", nrow(x$details$new_sample)))#, cex = 0.8 * fsize)
+  title(xlab = paste0("N = ", nrow(x$details$new_sample)),
+        adj = 0.99, line = -1, cex.lab = 1.5)
+  #legend("bottomright", paste0("N = ", nrow(x$details$new_sample)))#, cex = 0.8 * fsize)
 }
 
 #' Plot the change in the distribution of X

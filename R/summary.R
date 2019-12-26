@@ -7,16 +7,20 @@
 #'
 #' @export
 
-summary.optint <- function(object, r = 5){
+summary.optint <- function(object, r = 4){
   x <- object
   est <- round(x$estimates, r)
   se <- round(x$estimates_sd, r)
   p_val <- round(x$details$p_value, r)
+  #truncate p values:
+  p_val[p_val == 0] <- paste0("<", 10^-r, sep = "")
   kl <- x$details$kl_distance
   out <- round(x$details$Y_diff, r)
   out_sd <- round(x$details$Y_diff_sd, r)
-  out_t <- out / out_sd
-  out_p <- 2 * pnorm(abs(out_t), lower.tail = F)
+  out_t <- round(out / out_sd , r)
+  out_p <- round(2 * pnorm(abs(out_t), lower.tail = F), r)
+  #truncate p value:
+  out_p <- ifelse(out_p == 0, paste0("<", 10^-r, sep = "") , out_p)
   n <- length(est)
   var_names <- colnames(x$details$new_sample[,1:n])
   #add signs to var names:
@@ -38,10 +42,11 @@ summary.optint <- function(object, r = 5){
   coef_title <- ifelse(method == "correlations", "Raw Correlations:", "CDF Distances:")
   cat("\n", "\n",coef_title, "\n", "\n")
   print(as.data.frame(coeffs))
-  cat("\n", "The Kullback–Leibler divergence of P(X|I=0) from P(X|I=1) is:", kl, "\n")
+  cat("---", "\n", "(1) Signif. codes: 0.1 '*' 0.05 '**' 0.01 '***'")
+  cat("\n", "(2) The Kullback–Leibler divergence of P(X|I=0) from P(X|I=1) is:", kl, "\n")
   cat("\n", "Outcome Difference (excluding zeros):", "\n", "\n")
-  print(out_mat)
-  cat("\n", "Note: Y is in log units")
+  print(as.data.frame(out_mat))
+  cat("---", "\n", "Note: Y is in log units")
 }
 
 
