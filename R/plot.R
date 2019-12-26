@@ -106,15 +106,16 @@ plot.optint <- function(object, plot.vars = "sig", plot.ci = T,
 #'
 #' Plot denisty or barchart of X, before and after the intervention.
 #'
-#' @param print.sep logical. If TRUE (default) plot each graph seperatly.
-#'                  This option is highly recommended for more than 4 variables.
-#' @param line.type
+#' @param n.val variable with more values than 'n.val' will be displayed by
+#'              density plot, while variable with less values will be
+#'              displayed by histogram.
+#' @param line.type line type for \code{\link[lattice]{densityplot}}
 #' @inheritParams plot.optint
 #' @export
 
 plot_change <- function(object, plot.vars = "sig",
                         graph.col = c("lightcoral", "cadetblue3"),
-                        alpha = 0.05, print.sep = T, line.type = c(1,2), ...){
+                        alpha = 0.05, line.type = c(1,2), n.val = 10, ...){
   x <- object
   if(x$details$method == "correlations")
     stop("plot_change() isn't available for the correlations method")
@@ -137,15 +138,29 @@ plot_change <- function(object, plot.vars = "sig",
            text=list(c("After","Before")))
   for(i in inc){
     var <- x$details$new_sample[,i]
+    num_val <- length(unique(var))
     #for binary variables, plot barchart
-    if(all(unique(var) %in% c(0,1))){
+    if(num_val == 2){
       freq_bef <- weighted.mean(var, wgt)
       freq_aft <- weighted.mean(var, wgt1)
       gdata <- matrix(c(freq_bef, freq_aft, 1 - freq_bef, 1 - freq_aft),
                       ncol = 2, dimnames = list(c("Before", "After")))
-      graph <- lattice::barchart(gdata, stack = T, horizontal = F,
+      graph <- lattice::barchart(gdata, stack = T, horizontal = F, ylab = "",
                                  col = graph.col, xlab = var_names[count])
-    } else {
+      print(graph)
+    }
+    if(num_val > 2 & num_val <= n.val){
+      #plot histogram:
+      #determine ylim
+      #add legend
+      hist0 <- weights::wtd.hist(var, weight = wgt, col = rgb(0, 0, 1, 0.3),
+                                 ylab = "", xlab = var_names[count],
+                                 main = "")
+      hist1 <- weights::wtd.hist(var, weight = wgt1, col = rgb(1, 0, 0, 0.3),
+                                 ylab = "", add = T,
+                                 main = "")
+    }
+    if(num_val > n.val){
       #for continouous variables, plot densityplot
       #graph boarders:
       x_lim <- c(min(var), max(var))
@@ -155,16 +170,7 @@ plot_change <- function(object, plot.vars = "sig",
                                     ylab = "", xlab = var_names[count],
                                     col = graph.col, plot.points = T,
                                     key = leg, lwd = 3, lty = line.type)
-    }
-    if(print.sep){
       print(graph)
-    } else {
-      if(count > 4){
-        stop("can't print more than 4 graphs. please set 'print.sep = T'")
-      }
-      final <- count == n_graphs | count == 4
-      tot_col <- min(n_graphs, 4)
-      print(graph, split = c(count, 1, tot_col, 1), more = !final)
     }
     count <- count + 1
   }

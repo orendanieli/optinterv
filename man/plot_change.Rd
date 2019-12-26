@@ -5,8 +5,7 @@
 \title{Plot the change in the distribution of X}
 \usage{
 plot_change(object, plot.vars = "sig", graph.col = c("lightcoral",
-  "cadetblue3"), alpha = 0.05, print.sep = T, line.type = c(1, 2),
-  ...)
+  "cadetblue3"), alpha = 0.05, line.type = c(1, 2), n.val = 10, ...)
 }
 \arguments{
 \item{object}{an optint object.}
@@ -21,8 +20,11 @@ indicating to plot the first n variables,
 \item{alpha}{significance level for the confidence intervals. also
 used in order to determine which variables are significant.}
 
-\item{print.sep}{logical. If TRUE (default) plot each graph seperatly.
-This option is highly recommended for more than 4 variables.}
+\item{line.type}{line type for \code{\link[lattice]{densityplot}}}
+
+\item{n.val}{variable with more values than 'n.val' will be displayed by
+density plot, while variable with less values will be
+displayed by histogram.}
 }
 \description{
 Plot denisty or barchart of X, before and after the intervention.
