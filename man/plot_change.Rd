@@ -23,7 +23,7 @@ used in order to determine which variables are significant.}
 \item{line.type}{line type for \code{\link[lattice]{densityplot}}}
 
 \item{n.val}{variable with more values than 'n.val' will be displayed by
-density plot, while variable with less values will be
+density plot, while variable with fewer values will be
 displayed by histogram.}
 }
 \description{

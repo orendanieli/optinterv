@@ -107,7 +107,7 @@ plot.optint <- function(object, plot.vars = "sig", plot.ci = T,
 #' Plot denisty or barchart of X, before and after the intervention.
 #'
 #' @param n.val variable with more values than 'n.val' will be displayed by
-#'              density plot, while variable with less values will be
+#'              density plot, while variable with fewer values will be
 #'              displayed by histogram.
 #' @param line.type line type for \code{\link[lattice]{densityplot}}
 #' @inheritParams plot.optint
@@ -151,14 +151,22 @@ plot_change <- function(object, plot.vars = "sig",
     }
     if(num_val > 2 & num_val <= n.val){
       #plot histogram:
+      hist0 <- weights::wtd.hist(var, weight = wgt, breaks = num_val, plot = F)
+      hist1 <- weights::wtd.hist(var, weight = wgt1, breaks = num_val, plot = F)
       #determine ylim
+      y.lim <- c(0, max(c(hist0$counts, hist1$counts)))
+      #plot hist0
+      plot(hist0, col = rgb(0, 0, 1, 0.7), ylab = "", xlab = var_names[count],
+           main = "", ylim = y.lim)
+      #plot hist1
+      plot(hist1, col = rgb(1, 0, 0, 0.4), ylab = "", add = T,
+           main = "", ylim = y.lim)
       #add legend
-      hist0 <- weights::wtd.hist(var, weight = wgt, col = rgb(0, 0, 1, 0.3),
-                                 ylab = "", xlab = var_names[count],
-                                 main = "")
-      hist1 <- weights::wtd.hist(var, weight = wgt1, col = rgb(1, 0, 0, 0.3),
-                                 ylab = "", add = T,
-                                 main = "")
+      #fix legend
+      par(xpd = T, mar = par()$mar + c(0,0,2,0))
+      leg_pos <- c(hist0$breaks[which.min(hist0$counts)] ,y.lim[2] + 0.4)
+      legend(x = leg_pos[1], y = leg_pos[2], c("Before", "After"), fill=c("royalblue1", "lightpink"))
+      par(mar=c(5, 4, 4, 2) + 0.1)
     }
     if(num_val > n.val){
       #for continouous variables, plot densityplot
