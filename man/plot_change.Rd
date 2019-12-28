@@ -27,5 +27,7 @@ density plot, while variable with fewer values will be
 displayed by histogram.}
 }
 \description{
-Plot denisty or barchart of X, before and after the intervention.
+Illustrates how the intervention changes the distribution of X by plotting
+barchart (for binary variables) / denisty plot or histogram of X (depending on n.val),
+before and after the intervention.
 }
