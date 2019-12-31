@@ -24,10 +24,10 @@ used in order to determine which variables are significant.}
 
 \item{n.val}{variable with more values than 'n.val' will be displayed by
 density plot, while variable with fewer values will be
-displayed by histogram.}
+displayed by barchart.}
 }
 \description{
 Illustrates how the intervention changes the distribution of X by plotting
-barchart (for binary variables) / denisty plot or histogram of X (depending on n.val),
+barchart (for categorical variables) or denisty plot (for continouous variables),
 before and after the intervention.
 }

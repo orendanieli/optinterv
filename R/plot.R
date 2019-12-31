@@ -105,12 +105,12 @@ plot.optint <- function(object, plot.vars = "sig", plot.ci = T,
 #' Plot the change in the distribution of X
 #'
 #' Illustrates how the intervention changes the distribution of X by plotting
-#' barchart (for binary variables) / denisty plot or histogram of X (depending on n.val),
+#' barchart (for categorical variables) or denisty plot (for continouous variables),
 #' before and after the intervention.
 #'
 #' @param n.val variable with more values than 'n.val' will be displayed by
 #'              density plot, while variable with fewer values will be
-#'              displayed by histogram.
+#'              displayed by barchart.
 #' @param line.type line type for \code{\link[lattice]{densityplot}}
 #' @inheritParams plot.optint
 #' @export
@@ -120,7 +120,8 @@ plot_change <- function(object, plot.vars = "sig",
                         alpha = 0.05, line.type = c(1,2), n.val = 10, ...){
   x <- object
   if(x$details$method == "correlations")
-    stop("plot_change() isn't available for the correlations method")
+    stop(paste("plot_change() isn't available for the correlations method.",
+               "the distribution of x just shifts by 1/lambda * cov(x,y)"))
   inc <- var_pos(x, plot.vars, alpha)
   wgt <- x$details$new_sample[,"wgt"]
   wgt1 <- x$details$new_sample[,"wgt1"]
@@ -136,41 +137,32 @@ plot_change <- function(object, plot.vars = "sig",
   count <- 1
   #edit legend (for densityplot)
   leg <- list(space="top",
-           lines=list(col=graph.col,  lty=line.type),
+           lines=list(col=graph.col,  lty=line.type, lwd = 4),
            text=list(c("After","Before")))
   for(i in inc){
     var <- x$details$new_sample[,i]
-    num_val <- length(unique(var))
-    #for binary variables, plot barchart
-    #add legend
-    if(num_val == 2){
-      freq_bef <- weighted.mean(var, wgt)
-      freq_aft <- weighted.mean(var, wgt1)
-      gdata <- matrix(c(freq_bef, freq_aft, 1 - freq_bef, 1 - freq_aft),
-                      ncol = 2, dimnames = list(c("Before", "After")))
-      graph <- lattice::barchart(gdata, stack = T, horizontal = F, ylab = "",
-                                 col = graph.col, xlab = var_names[count])
+    values <- unique(var)
+    num_val <- length(values)
+    #for categorical variables, plot barchart
+    if(num_val <= n.val){
+      values <- values[order(values)]
+      #create data:
+      gdata <- matrix(nrow = num_val, ncol = 2,
+                      dimnames = list(as.character(values), c("Before", "After")))
+      r_ind <- 1
+      #calculate frequency for each value seperately
+      for(v in values){
+        gdata[r_ind,1] <- weighted.mean(var == v, wgt)
+        gdata[r_ind,2] <- weighted.mean(var == v, wgt1)
+        r_ind <- r_ind + 1
+      }
+      graph <- lattice::barchart(gdata, stack = F, horizontal = F, ylab = "",
+                                 auto.key = list(space="top", columns= 2),
+                                 par.settings = list(superpose.polygon = list(col = graph.col[c(2,1)])),
+                                 xlab = var_names[count])
+
       print(graph)
-    }
-    if(num_val > 2 & num_val <= n.val){
-      #plot histogram:
-      #determine breaks:
-      br <- min(num_val, 20)
-      hist0 <- weights::wtd.hist(var, weight = wgt, breaks = br, plot = F)
-      hist1 <- weights::wtd.hist(var, weight = wgt1, breaks = br, plot = F)
-      #determine ylim
-      y.lim <- c(0, max(c(hist0$counts, hist1$counts)))
-      #plot hist0
-      plot(hist0, col = rgb(0, 0, 1, 0.7), ylab = "", xlab = var_names[count],
-           main = "", ylim = y.lim)
-      #plot hist1
-      plot(hist1, col = rgb(1, 0, 0, 0.4), ylab = "", add = T,
-           main = "", ylim = y.lim)
-      #add legend
-      legend("bottomright", c("Before", "After"), fill=c("royalblue1", "lightpink"),
-             inset=c(0,1), xpd=TRUE, horiz=TRUE, bty="n")
-    }
-    if(num_val > n.val){
+    } else {
       #for continouous variables, plot densityplot
       #graph boarders:
       x_lim <- c(min(var), max(var))
