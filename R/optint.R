@@ -92,21 +92,8 @@ optint <- function(Y, X,
     X_std <- apply(X, 2, function(x, w = wgt){x / sqrt(Hmisc::wtd.var(x, w))})
     Y_pos <- prepare_Y(Y)
     func <- ifelse(method == "nn-", "non_parm", "nn")
-    #create bootstrap function
-    boot_func <- function(d, i){
-      w <- do.call(func, list(Y_pos[i], X_std[i,,drop = F], control[i,,drop = F],
-                              wgt =  wgt[i], lambda =  lambda, sigma = sigma,
-                              grp.size = grp.size))
-      if(quick){
-        diff <- apply(X[i,,drop = F], 2, function(v) mean_diff(v, wgt[i], w))
-        return(diff)
-      }
-      dists <- apply(X_std[i,,drop = F], 2,
-                     function(v) per_distance(v, n.quant, wgt[i], w))
-      diff <- outcome_diff(Y[i], w, wgt[i])
-      return(c(dists, diff))
-    }
-    res <- boot::boot(1:length(Y), boot_func, n.boot, stype = "i")
+    res <- boot_default(func, Y, Y_pos, X, X_std, control, wgt, n.quant,
+                         lambda, sigma, grp.size, n.boot, quick)
     estimates <- res$t0[-(n + 1)]
     if(quick){
       estimates_sd <- apply(res$t[,-(n + 1), drop = F], 2, sd)

@@ -14,7 +14,8 @@ Imports:
     distances,
     weights,
     boot,
-    lattice
+    lattice,
+    pbapply
 RoxygenNote: 6.1.1
 Suggests: 
     knitr,

@@ -145,17 +145,27 @@ boot_ci <- function(boot.res, alpha = 0.05){
 #' @return vector of p values.
 
 perm_test <- function(estimates, wgt, wgt1, X, n.quant, n.perm = 1000, ...){
-  n <- nrow(X)
+  #necessary variable for pbapply:
+  pbo = pbapply::pboptions(type="txt")
+  rep_count <- 1
+  cat("Permutation Report:", "\n")
   p <- ncol(X)
-  #permute 'n.perm' permutations from X rows index
-  perm_rows <- replicate(n.perm, sample(1:n, n, replace = F))
-  #for each variable, calculate per_distance for each permutation.
+  perm_func <- function(d, i){
+    #print progress:
+    setpb(pb, rep_count)
+    rep_count <<- rep_count + 1
+    apply(d[i,,drop = F], 2,
+          function(x) per_distance(x, n.quant, wgt, wgt1))
+  }
+  #start report:
+  pb <- pbapply::startpb(min = 0, max = n.perm)
+  res <- boot::boot(X, perm_func, sim = "permutation", n.perm, stype = "i")
+  pbapply::closepb(pb)
+  #necessary for pbapply:
+  rep_count <- 1
   p_val <- rep(NA, p)
-  for (i in 1:p){
-    dist_sample <- apply(perm_rows, 2,
-                             function(r){per_distance(X[r,i], n.quant, wgt, wgt1)})
-    #calculate P(estimate < dist_sample) (=p value)
-    p_val[i] <- mean(estimates[i] < dist_sample)
+  for(i in 1:p){
+    p_val[i] <- mean(estimates[i] < res$t[,i])
   }
   return(p_val)
 }
@@ -165,5 +175,41 @@ mean_diff <- function(x, wgt, wgt1){
   diff <- weighted.mean(x, wgt1) - weighted.mean(x, wgt)
   return(diff)
 }
+
+#' Bootstrap (default)
+
+#' Bootstrap function for the non-parametric and the nearest neighbor methods
+#' @return a list - the output from the function 'boot()'.
+
+boot_default <- function(func, Y, Y_pos, X, X_std, control, wgt, n.quant,
+                         lambda, sigma, grp.size, n.boot, quick, ...){
+  #create bootstrap function
+  boot_func <- function(d, i){
+    #print progress:
+    setpb(pb, rep_count)
+    rep_count <<- rep_count + 1
+    w <- do.call(func, list(Y_pos[i], X_std[i,,drop = F], control[i,,drop = F],
+                            wgt =  wgt[i], lambda =  lambda, sigma = sigma,
+                            grp.size = grp.size))
+    if(quick){
+      diff <- apply(X[i,,drop = F], 2, function(v) mean_diff(v, wgt[i], w))
+      return(diff)
+    }
+    dists <- apply(X_std[i,,drop = F], 2,
+                   function(v) per_distance(v, n.quant, wgt[i], w))
+    diff <- outcome_diff(Y[i], w, wgt[i])
+    return(c(dists, diff))
+  }
+  #necessary variable for pbapply:
+  rep_count <-  1
+  cat("Bootstrap Report:", "\n")
+  pb <- pbapply::startpb(min = 0, max = n.boot)
+  res <- boot::boot(1:length(Y), boot_func, n.boot, stype = "i")
+  pbapply::closepb(pb)
+  #necessary for pbapply:
+  rep_count <- 1
+  return(res)
+}
+
 
 
