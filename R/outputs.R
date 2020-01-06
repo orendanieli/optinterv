@@ -145,18 +145,17 @@ boot_ci <- function(boot.res, alpha = 0.05){
 #' @return vector of p values.
 
 perm_test <- function(estimates, wgt, wgt1, X, n.quant, n.perm = 1000, ...){
-  #necessary variable for pbapply:
-  pbo = pbapply::pboptions(type="txt")
-  rep_count <- 1
-  cat("Permutation Report:", "\n")
   p <- ncol(X)
   perm_func <- function(d, i){
     #print progress:
-    setpb(pb, rep_count)
+    pbapply::setpb(pb, rep_count)
     rep_count <<- rep_count + 1
     apply(d[i,,drop = F], 2,
           function(x) per_distance(x, n.quant, wgt, wgt1))
   }
+  #necessary variable for pbapply:
+  rep_count <- 1
+  cat("Permutation Report:", "\n")
   #start report:
   pb <- pbapply::startpb(min = 0, max = n.perm)
   res <- boot::boot(X, perm_func, sim = "permutation", n.perm, stype = "i")
@@ -186,7 +185,7 @@ boot_default <- function(func, Y, Y_pos, X, X_std, control, wgt, n.quant,
   #create bootstrap function
   boot_func <- function(d, i){
     #print progress:
-    setpb(pb, rep_count)
+    pbapply::setpb(pb, rep_count)
     rep_count <<- rep_count + 1
     w <- do.call(func, list(Y_pos[i], X_std[i,,drop = F], control[i,,drop = F],
                             wgt =  wgt[i], lambda =  lambda, sigma = sigma,
@@ -203,6 +202,7 @@ boot_default <- function(func, Y, Y_pos, X, X_std, control, wgt, n.quant,
   #necessary variable for pbapply:
   rep_count <-  1
   cat("Bootstrap Report:", "\n")
+  #start report:
   pb <- pbapply::startpb(min = 0, max = n.boot)
   res <- boot::boot(1:length(Y), boot_func, n.boot, stype = "i")
   pbapply::closepb(pb)
