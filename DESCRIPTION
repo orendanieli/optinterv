@@ -3,7 +3,7 @@ Type: Package
 Title: Optimal Intervention
 Version: 0.1.0
 Author: Oren Danieli & Elad Guttman
-Maintainer: The package maintainer <eladguttman@mail.tau.ac.il>
+Maintainer: Elad <eladguttman@mail.tau.ac.il>
 Description: identifies the factors with the greatest potential 
   to increase a pre-specified outcome, using observational data.
 License: GPL-3

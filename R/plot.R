@@ -181,7 +181,13 @@ plot_change <- function(object, plot.vars = "sig",
 #' Plot optint object, by group
 #'
 #' Produce variables importance plot from an optint_by_group object.
-#'
+#' This plot has several features:
+#' \describe{
+#'   \item{1.}{Estimates here are \eqn{E(X | I=1) - E(X | I=0)} and not cdf distances.}
+#'   \item{2.}{Star is added to variable name if there is a
+#'             significant difference between at least two groups.}
+#'   \item{3.}{Estimates are standardized before they plotted (so different set of variables
+#'             will have different standardization factor.)}}
 #' @param object an optint_by_group object.
 #' @param plot.vars which variables to plot? either a number (n) -
 #'                  indicating to plot the first n variables,
@@ -262,11 +268,11 @@ plot.optint_by_group <- function(object,
   upper_ci <- (est + sd*z) / stand_factor
   est <- est / stand_factor
   #borders of graph to display, to include all CI
-  x_lim <- c(min(lower_ci), max(upper_ci))
+  x_lim <- c(min(min(lower_ci), 0), max(upper_ci))
   #decide font size
   fsize <- ifelse(n_vars  > 20, 0.5, 0.9)
   #empty plot with correct borders
-  dotchart(rep(80, n_vars), var_names[inc],
+  dotchart(rep(80, n_vars), var_names,
            pch = 19, cex = fsize, col = 1,
            col.axis = 2,
            xlim = x_lim)

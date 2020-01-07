@@ -129,6 +129,7 @@ optint <- function(Y, X,
       covs <- cor_cov$covariance
       cors <- cor_cov$correlation
       betas <- lm(Y[i] ~ cbind(X[i,], control[i,]), weights = wgt[i])$coefficients
+      #should be in log of min(Y) > 0
       diff <- (1/lambda) * (betas[2:(n+1)] %*% covs)
       c(cors, diff)
     }
@@ -176,6 +177,8 @@ optint <- function(Y, X,
 #'
 #' @param group vector with group labels (i.e. grouping variable). the function
 #'              \code{\link{optint}} implemented for each group separately.
+#' @param plot logical. if TRUE (default), the results are plotted by
+#'             \code{\link{plot.optint_by_group}}.
 #' @inheritParams optint
 #'
 #' @return an object of class "optint_by_group". This object is a list containing

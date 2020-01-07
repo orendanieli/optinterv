@@ -40,7 +40,8 @@ confidence intervals calculation.}
 
 \item{alpha}{significance level for the confidence intervals.}
 
-\item{plot}{logical. if TRUE (default), the results are plotted by \code{\link{plot.optint}}.}
+\item{plot}{logical. if TRUE (default), the results are plotted by
+\code{\link{plot.optint_by_group}}.}
 }
 \value{
 an object of class "optint_by_group". This object is a list containing

@@ -24,4 +24,11 @@ used in order to determine which variables are significant.}
 }
 \description{
 Produce variables importance plot from an optint_by_group object.
+This plot has several features:
+\describe{
+  \item{1.}{Estimates here are \eqn{E(X | I=1) - E(X | I=0)} and not cdf distances.}
+  \item{2.}{Star is added to variable name if there is a
+            significant difference between at least two groups.}
+  \item{3.}{Estimates are standardized before they plotted (so different set of variables
+            will have different standardization factor.)}}
 }
