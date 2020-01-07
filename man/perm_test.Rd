@@ -5,7 +5,8 @@
 \title{Permutation test
 Test the null hypothesis P(X|I=0) = P(X|I=1), using permutation test.}
 \usage{
-perm_test(estimates, wgt, wgt1, X, n.quant, n.perm = 1000, ...)
+perm_test(estimates, wgt, wgt1, X, n.quant, n.perm = 1000, Y = NULL,
+  control = NULL, func = "non_parm", ...)
 }
 \arguments{
 \item{estimates}{point estimates of the percentile distance between P(X|I=0) & P(X|I=1).}
@@ -17,6 +18,16 @@ perm_test(estimates, wgt, wgt1, X, n.quant, n.perm = 1000, ...)
 \item{n.quant}{number of quantiles to use when calculating CDF distance.}
 
 \item{n.perm}{number of permutations to permute from wgt1.}
+
+\item{Y}{outcome vector (must be numeric without NA's).}
+
+\item{control}{numeric data frame or matrix of factors to control for. these are factors
+that we can't consider while looking for the optimal intervention
+(e.g. race).}
+
+\item{func}{either "non_parm" or "nn". for "nn", weights are recalculated for each
+permutation, and thus Y and control are needed. the default is "non_parm",
+and Y and control aren't needed.}
 }
 \value{
 vector of p values.

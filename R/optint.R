@@ -107,7 +107,8 @@ optint <- function(Y, X,
     kl_distance <- kl_dist_def(wgt, wgt1)
     #estimates = apply(X_std, 2, function(v) per_distance(v, n.quant, wgt, wgt1))#
     if(perm.test){
-      p_val <- perm_test(estimates, wgt, wgt1, X_std, n.quant, n.perm)
+      p_val <- perm_test(estimates, wgt, wgt1, X_std, n.quant, n.perm,
+                         Y_pos, control, func)
     } else {
       p_val <- rep(NA, n)
     }

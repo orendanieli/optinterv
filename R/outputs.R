@@ -140,18 +140,31 @@ boot_ci <- function(boot.res, alpha = 0.05){
 
 #' @param estimates point estimates of the percentile distance between P(X|I=0) & P(X|I=1).
 #' @param n.perm number of permutations to permute from wgt1.
+#' @param func either "non_parm" or "nn". for "nn", weights are recalculated for each
+#'             permutation, and thus Y and control are needed. the default is "non_parm",
+#'             and Y and control aren't needed.
 #' @inheritParams optint
 #'
 #' @return vector of p values.
 
-perm_test <- function(estimates, wgt, wgt1, X, n.quant, n.perm = 1000, ...){
+perm_test <- function(estimates, wgt, wgt1, X, n.quant, n.perm = 1000,
+                      Y = NULL, control = NULL, func = "non_parm", ...){
   p <- ncol(X)
-  perm_func <- function(d, i){
-    #print progress:
-    pbapply::setpb(pb, rep_count)
-    rep_count <<- rep_count + 1
-    apply(d[i,,drop = F], 2,
-          function(x) per_distance(x, n.quant, wgt, wgt1))
+  if(func == "nn"){
+    perm_func <- function(d, i){
+      #print progress:
+      pbapply::setpb(pb, rep_count)
+      rep_count <<- rep_count + 1
+      wgt1 <- nn(Y, d[i,,drop = F], control, wgt)
+      apply(d[i,,drop = F], 2,
+            function(x) per_distance(x, n.quant, wgt, wgt1))}
+    } else {
+      perm_func <- function(d, i){
+        #print progress:
+        pbapply::setpb(pb, rep_count)
+        rep_count <<- rep_count + 1
+        apply(d[i,,drop = F], 2,
+              function(x) per_distance(x, n.quant, wgt, wgt1))}
   }
   #necessary variable for pbapply:
   rep_count <- 1
