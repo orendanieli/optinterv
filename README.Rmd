@@ -20,7 +20,7 @@ devtools::install_github("eladg9/optinterv")
 ```
 
 ##Useage Example
-*Note:* Currently the significance test is not precise and could produce incorrect p-values. 
+
 ```{r, message=FALSE, eval=FALSE}
 library(optinterv)
 #generate data
@@ -40,7 +40,7 @@ plot(imp_feat, plot.vars = 10)
 #show summary of the results using summary():
 summary(imp_feat)
 #we can look on the new features distribution more deeply, using plot_change():
-plot_change(imp_feat, plot.vars = "sig", print.sep = TRUE)
+plot_change(imp_feat, plot.vars = "sig")
 #we can explore how the optimal intervention varies between genders using optint_by_group():
 men <- as.vector(men)
 imp_feat_by_gender <- optint_by_group(Y = outcome, X = features,
