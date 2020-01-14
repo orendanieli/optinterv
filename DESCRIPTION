@@ -4,7 +4,7 @@ Title: Optimal Intervention
 Version: 0.1.0
 Author: Oren Danieli & Elad Guttman
 Maintainer: Elad <eladguttman@mail.tau.ac.il>
-Description: identifies the factors with the greatest potential 
+Description: Identifies the factors with the greatest potential 
   to increase a pre-specified outcome, using observational data.
 License: GPL-3
 Encoding: UTF-8
@@ -15,7 +15,8 @@ Imports:
     weights,
     boot,
     lattice,
-    pbapply
+    pbapply,
+    Hmisc
 RoxygenNote: 6.1.1
 Suggests: 
     knitr,

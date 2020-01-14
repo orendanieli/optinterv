@@ -4,10 +4,10 @@
 \alias{var_pos}
 \title{Variable Position}
 \usage{
-var_pos(object, plot.vars = "sig", alpha, ...)
+var_pos(x, plot.vars = "sig", alpha, ...)
 }
 \arguments{
-\item{object}{an optint object.}
+\item{x}{an optint object.}
 
 \item{plot.vars}{which variables to plot? either a number (n) -
 indicating to plot the first n variables,

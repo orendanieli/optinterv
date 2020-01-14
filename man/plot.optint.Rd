@@ -4,11 +4,11 @@
 \alias{plot.optint}
 \title{Plot optint object}
 \usage{
-\method{plot}{optint}(object, plot.vars = "sig", plot.ci = T,
+\method{plot}{optint}(x, plot.vars = "sig", plot.ci = T,
   graph.col = 1, alpha = 0.05, ...)
 }
 \arguments{
-\item{object}{an optint object.}
+\item{x}{an optint object.}
 
 \item{plot.vars}{which variables to plot? either a number (n) -
 indicating to plot the first n variables,

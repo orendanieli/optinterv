@@ -51,7 +51,7 @@
 #'         wgt (the original weights) and wgt1 (the new weights under \eqn{I = 1}.)
 #'  }
 #'
-#' In addition, the function \code{\link[Matrix]{summary}} can be used to
+#' In addition, the function \code{\link[base]{summary}} can be used to
 #' print a summary of the results.
 #'
 #' @examples
@@ -123,6 +123,18 @@ optint <- function(Y, X,
     if(!is.null(control)){
       control <- as.matrix(control)
     }
+    if(min(Y) >= 0 & length(unique(Y)) > 2){
+      #transform to log
+      pos_ind <- Y > 0
+      if(!all(pos_ind)){
+        Y <- Y[pos_ind]
+        X <- X[pos_ind,,drop = F]
+        control <- control[pos_ind,,drop = F]
+        wgt <- wgt[pos_ind]
+        warning("excluding observations with Y = 0")
+      }
+      Y <- log(Y)
+    }
     res <- par_cor(Y, X, control, wgt)
     estimates <- res$correlation
     estimates_sd <- res$std.err
@@ -130,21 +142,31 @@ optint <- function(Y, X,
       return(data.frame(estimates = estimates, estimated_sd = estimates_sd))
     }
     ni <- (1/lambda) * res$covariance
-    print(ni)
     kl_distance <- kl_dist_cor(X, wgt, ni)
+    #outcome difference:
     ols <- lm(Y ~ cbind(X, control), weights = wgt)
-    pred_y0 <- predict(ols)
+    y_hat <- predict(ols)
+    #make E(y_hat) = 0
+    y_hat <- y_hat - mean(y_hat)
+    n_obs <- length(Y)
+    Y_diff <- (1 / lambda) * weighted.mean(y_hat^2, wgt)
+    Y_diff_sd <- sqrt(Hmisc::wtd.var(y_hat^2, wgt) / (n_obs * lambda^2))
+    #print(Y_diff_sd)
+    #boot_func <- function(d, i){
+    #  ols <- lm(Y[i] ~ cbind(X[i,,drop=F], control[i,,drop=F]), weights = wgt[i])
+    #  y_hat <- predict(ols)
+    #  y_hat <- y_hat - mean(y_hat)
+    #  Y_diff <- weighted.mean(y_hat^2, wgt[i])
+    #  Y_diff <- (1 / lambda) * Y_diff
+    #  return(Y_diff)
+    #}
+    #res_boot <- boot::boot(1:length(Y), boot_func, n.boot, stype = "i")
+    #Y_diff_sd <- sd(res_boot$t)
     #update X
     X <- t(t(X) + ni)
     wgt1 <- wgt
     signs <- sign(estimates)
     p_val <- res$p.value
-    dat <- as.data.frame(cbind(X, control))
-    pred_y1 <- predict(ols, newdata = dat, weights = wgt)
-    diff <- pred_y1 - pred_y0
-    n_obs <- length(Y)
-    Y_diff <- weighted.mean(diff, wgt)
-    Y_diff_sd <- sqrt((weighted.mean(diff^2, wgt) - Y_diff^2) / n_obs)
     ci <- cor_ci(estimates, length(Y), alpha)
   }
   #we dont need standardization factor if we have only one variable

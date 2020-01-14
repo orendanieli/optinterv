@@ -4,11 +4,11 @@
 \alias{plot_change}
 \title{Plot the change in the distribution of X}
 \usage{
-plot_change(object, plot.vars = "sig", graph.col = c("lightcoral",
-  "cadetblue3"), alpha = 0.05, line.type = c(1, 2), n.val = 10, ...)
+plot_change(x, plot.vars = "sig", graph.col = c("red", "blue"),
+  alpha = 0.05, line.type = c(1, 2), n.val = 10, ...)
 }
 \arguments{
-\item{object}{an optint object.}
+\item{x}{an optint object.}
 
 \item{plot.vars}{which variables to plot? either a number (n) -
 indicating to plot the first n variables,

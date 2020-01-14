@@ -4,11 +4,11 @@
 \alias{plot.optint_by_group}
 \title{Plot optint object, by group}
 \usage{
-\method{plot}{optint_by_group}(object, plot.vars = "sig",
-  graph.col = NULL, alpha = 0.05, ...)
+\method{plot}{optint_by_group}(x, plot.vars = "sig", graph.col = NULL,
+  alpha = 0.05, ...)
 }
 \arguments{
-\item{object}{an optint_by_group object.}
+\item{x}{an optint_by_group object.}
 
 \item{plot.vars}{which variables to plot? either a number (n) -
 indicating to plot the first n variables,

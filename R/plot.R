@@ -3,7 +3,7 @@
 #' @param names vector of variable names.
 #' @param signs vector of signs (the same length as names).
 add_sign <- function(names, signs){
-  sgn_symbol <- ifelse(signs > 0, " (+)", ifelse(signs < 0, " (-)", " (±)"))
+  sgn_symbol <- ifelse(signs > 0, " (+)", ifelse(signs < 0, " (-)", " (\u00B1)"))
   var_names <- paste0(names, sgn_symbol)
   return(var_names)
 }
@@ -16,8 +16,7 @@ add_sign <- function(names, signs){
 #' @inheritParams plot.optint
 #' @return vector of variables incidents
 
-var_pos <- function(object, plot.vars = "sig", alpha, ...){
-  x <- object
+var_pos <- function(x, plot.vars = "sig", alpha, ...){
   n <- length(x$estimates)
   #estimates positions
   if(is.numeric(plot.vars)){
@@ -27,7 +26,7 @@ var_pos <- function(object, plot.vars = "sig", alpha, ...){
       inc <- which(x$details$p_value < alpha)
       if(length(inc) == 0){
         inc <- 1
-        warning("There are no significant variables. displays the first variable")
+        warning("There are no significant variables. display only the first one")
       }
     } else {
       var_names <- colnames(x$details$new_sample[,1:n])
@@ -41,7 +40,7 @@ var_pos <- function(object, plot.vars = "sig", alpha, ...){
 #'
 #' Produce variable importance plot from an optint object.
 #'
-#' @param object an optint object.
+#' @param x an optint object.
 #' @param plot.vars which variables to plot? either a number (n) -
 #'                  indicating to plot the first n variables,
 #'                  "sig" (default) - plot only significant  variables, or a vector
@@ -53,9 +52,8 @@ var_pos <- function(object, plot.vars = "sig", alpha, ...){
 #'              used in order to determine which variables are significant.
 #' @export
 
-plot.optint <- function(object, plot.vars = "sig", plot.ci = T,
+plot.optint <- function(x, plot.vars = "sig", plot.ci = T,
                         graph.col = 1, alpha = 0.05, ...){
-  x <- object
   inc <- var_pos(x, plot.vars, alpha)
   estimates <- x$estimates[inc]
   #absolute value of point estimates
@@ -116,10 +114,9 @@ plot.optint <- function(object, plot.vars = "sig", plot.ci = T,
 #' @inheritParams plot.optint
 #' @export
 
-plot_change <- function(object, plot.vars = "sig",
+plot_change <- function(x, plot.vars = "sig",
                         graph.col = c("red", "blue"),
                         alpha = 0.05, line.type = c(1,2), n.val = 10, ...){
-  x <- object
   if(x$details$method == "correlations")
     stop(paste("plot_change() isn't available for the correlations method.",
                "the distribution of x just shifts by 1/lambda * cov(x,y)"))
@@ -189,7 +186,7 @@ plot_change <- function(object, plot.vars = "sig",
 #'             significant difference between at least two groups.}
 #'   \item{3.}{Estimates are standardized before they plotted (so different set of variables
 #'             will have different standardization factor.)}}
-#' @param object an optint_by_group object.
+#' @param x an optint_by_group object.
 #' @param plot.vars which variables to plot? either a number (n) -
 #'                  indicating to plot the first n variables,
 #'                  "sig" (default) - plot only significant variables
@@ -199,12 +196,12 @@ plot_change <- function(object, plot.vars = "sig",
 #' @inheritParams plot.optint
 #' @export
 
-plot.optint_by_group <- function(object,
+plot.optint_by_group <- function(x,
                                  plot.vars = "sig",
                                  graph.col = NULL,
                                  alpha = 0.05, ...){
-  est <- object$est
-  sd <- object$sd
+  est <- x$est
+  sd <- x$sd
   n_group <- ncol(est)
   if(is.null(graph.col)){
     graph.col <- seq(2, n_group*2, 2)
@@ -255,7 +252,7 @@ plot.optint_by_group <- function(object,
   #sort to put the highest values first
   inc <- inc[order(abs(var_max))]
   #go back to original estimates (not absolut):
-  est <- object$est[inc,]
+  est <- x$est[inc,]
   sd <- sd[inc,]
   #if est & sd are vectors, transform them to matrix
   n_vars <- length(inc)

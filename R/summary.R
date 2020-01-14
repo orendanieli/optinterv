@@ -7,7 +7,7 @@
 #'
 #' @export
 
-summary.optint <- function(object, r = 4){
+summary.optint <- function(object, r = 4, ...){
   x <- object
   est <- round(x$estimates, r)
   se <- round(x$estimates_sd, r)
@@ -40,7 +40,7 @@ summary.optint <- function(object, r = 4){
   coef_title <- ifelse(method == "correlations", "Raw Correlations:", "CDF Distances:")
   cat("\n", "\n",coef_title, "\n", "\n")
   print(as.data.frame(coeffs))
-  cat("---", "\n", "(1) Signif. codes: 0.1 '*' 0.05 '**' 0.01 '***'")
+  cat("---", "\n", "(1) Signif. codes: 0.1 '\u002A' 0.05 '\u002A\u002A' 0.01 '\u002A\u002A\u002A'")
   cat("\n", "(2) The Kullback–Leibler divergence of P(X|I=0) from P(X|I=1) is:", kl, "\n")
   cat("\n", "Outcome Difference (excluding zeros):", "\n", "\n")
   print(as.data.frame(out_mat))
@@ -50,9 +50,9 @@ summary.optint <- function(object, r = 4){
 
 gen_star <- function(p_val){
   stars <- rep("", length(p_val))
-  stars[p_val >= 0.05 & p_val < 0.1] <- "*"
-  stars[p_val >= 0.01 & p_val < 0.05] <- "**"
-  stars[p_val < 0.01] <- "***"
+  stars[p_val >= 0.05 & p_val < 0.1] <- "\u002A"
+  stars[p_val >= 0.01 & p_val < 0.05] <- "\u002A\u002A"
+  stars[p_val < 0.01] <- "\u002A\u002A\u002A"
   return(stars)
 }
 

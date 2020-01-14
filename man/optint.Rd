@@ -77,7 +77,7 @@ an object of class "optint". This object is a list containing
         wgt (the original weights) and wgt1 (the new weights under \eqn{I = 1}.)
  }
 
-In addition, the function \code{\link[Matrix]{summary}} can be used to
+In addition, the function \code{\link[base]{summary}} can be used to
 print a summary of the results.
 }
 \description{
