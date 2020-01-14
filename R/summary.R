@@ -12,6 +12,8 @@ summary.optint <- function(object, r = 4){
   est <- round(x$estimates, r)
   se <- round(x$estimates_sd, r)
   p_val <- round(x$details$p_value, r)
+  #add stars as additional column:
+  star <- gen_star(p_val)
   #truncate p values:
   p_val[p_val == 0] <- paste0("<", 10^-r, sep = "")
   kl <- x$details$kl_distance
@@ -25,16 +27,12 @@ summary.optint <- function(object, r = 4){
   var_names <- colnames(x$details$new_sample[,1:n])
   #add signs to var names:
   var_names <- add_sign(var_names, x$details$signs)
-  #add stars as additional column:
-  star <- gen_star(p_val)
   coeffs <- matrix(c(est, se, p_val, star), ncol = 4,
                    dimnames = list(var_names, c("Estimate","Std. error","P-Value"," ")))
   out_mat <- matrix(c(out, out_sd, out_t, out_p), ncol = 4,
                     dimnames = list("E(Y|I=1) - E(Y|I=0)",
                                     c("Estimate","Std. error", "t value", "P(>|t|)")))
   method <- x$details$method
-  method <- ifelse(method == "crr", "correlations",
-                   ifelse(method == "nn-", "non-parametric", "nearest-neighbors"))
   lambda <- x$details$lambda
   cat("Method:", method, ", Lambda =", lambda)
   if (method == "nearest-neighbors")

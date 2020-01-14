@@ -21,6 +21,7 @@ outcome_diff <- function(Y, wgt1, wgt = rep(1, length(Y))){
   return(Y1 - Y0)
 }
 
+
 #' Distance Between Distributions
 #'
 #' Calculate distance in RMSE between quantiles of distributions
@@ -53,7 +54,9 @@ per_distance <- function(x, n.quant,
     return(distance)
   } else {
     sgn <- sign(q1 - q0)
-    tot <- sum(sgn) / n.quant
+    #dont consider quantiles that weren't changed
+    sgn <- sgn[sgn != 0]
+    tot <- mean(sgn)
     cutoff <- p - (1 - p)
     res <- ifelse(tot > cutoff, 1, ifelse(tot < -cutoff, -1 ,0))
     return(res)
@@ -133,6 +136,15 @@ boot_ci <- function(boot.res, alpha = 0.05){
   return(ci)
 }
 
+cor_ci <- function(estimates, n, alpha = 0.05){
+  z <- 0.5 * log((1 + estimates) / (1 - estimates))
+  s <- sqrt(1 / (n - 3))
+  up_ci <- z + qnorm(1 - alpha/2)*s
+  low_ci <- z - qnorm(1 - alpha/2)*s
+  up_ci <- (exp(2*up_ci) - 1) / (exp(2*up_ci) + 1)
+  low_ci <- (exp(2*low_ci) - 1) / (exp(2*low_ci) + 1)
+  return(rbind(low_ci, up_ci))
+}
 
 #' Permutation test
 
@@ -168,7 +180,7 @@ perm_test <- function(estimates, wgt, wgt1, X, n.quant, n.perm = 1000,
   }
   #necessary variable for pbapply:
   rep_count <- 1
-  cat("Permutation Report:", "\n")
+  cat("Calculating p-value:", "\n")
   #start report:
   pb <- pbapply::startpb(min = 0, max = n.perm)
   res <- boot::boot(X, perm_func, sim = "permutation", n.perm, stype = "i")
@@ -214,7 +226,7 @@ boot_default <- function(func, Y, Y_pos, X, X_std, control, wgt, n.quant,
   }
   #necessary variable for pbapply:
   rep_count <-  1
-  cat("Bootstrap Report:", "\n")
+  cat("Calculating standard errors:", "\n")
   #start report:
   pb <- pbapply::startpb(min = 0, max = n.boot)
   res <- boot::boot(1:length(Y), boot_func, n.boot, stype = "i")

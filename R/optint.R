@@ -105,6 +105,8 @@ optint <- function(Y, X,
     signs <- apply(X_std, 2,
                    function(v) per_distance(v, n.quant, wgt, wgt1, sign.factor, T))
     kl_distance <- kl_dist_def(wgt, wgt1)
+    estimates_sd <- apply(res$t[,-(n + 1), drop = F], 2, sd)
+    ci <- boot_ci(res$t[,-(n + 1), drop = F], alpha)
     #estimates = apply(X_std, 2, function(v) per_distance(v, n.quant, wgt, wgt1))#
     if(perm.test){
       p_val <- perm_test(estimates, wgt, wgt1, X_std, n.quant, n.perm,
@@ -112,6 +114,8 @@ optint <- function(Y, X,
     } else {
       p_val <- rep(NA, n)
     }
+    Y_diff = res$t0[n + 1]
+    Y_diff_sd = sd(res$t[,n + 1])
     #return(p_val)#
   } else {
     #correlations method
@@ -119,39 +123,39 @@ optint <- function(Y, X,
     if(!is.null(control)){
       control <- as.matrix(control)
     }
+    res <- par_cor(Y, X, control, wgt)
+    estimates <- res$correlation
+    estimates_sd <- res$std.err
     if(quick){
-      corrs <- par_cor(Y, X, control, wgt)
-      return(data.frame(estimates = corrs$correlation, estimated_sd = corrs$std.err))
+      return(data.frame(estimates = estimates, estimated_sd = estimates_sd))
     }
-    #create bootstrap function
-    boot_func <- function(d, i){
-      cor_cov <- par_cor(Y[i], X[i,,drop = F], control[i,,drop = F], wgt[i])
-      covs <- cor_cov$covariance
-      cors <- cor_cov$correlation
-      betas <- lm(Y[i] ~ cbind(X[i,], control[i,]), weights = wgt[i])$coefficients
-      #should be in log of min(Y) > 0
-      diff <- (1/lambda) * (betas[2:(n+1)] %*% covs)
-      c(cors, diff)
-    }
-    res <- boot::boot(1:length(Y), boot_func, n.boot, stype = "i")
-    point_est <- par_cor(Y, X, control, wgt)
-    ni <- (1/lambda) * point_est$covariance
+    ni <- (1/lambda) * res$covariance
+    print(ni)
     kl_distance <- kl_dist_cor(X, wgt, ni)
+    ols <- lm(Y ~ cbind(X, control), weights = wgt)
+    pred_y0 <- predict(ols)
+    #update X
     X <- t(t(X) + ni)
     wgt1 <- wgt
-    estimates <- point_est$correlation
     signs <- sign(estimates)
-    p_val <- point_est$p.value
+    p_val <- res$p.value
+    dat <- as.data.frame(cbind(X, control))
+    pred_y1 <- predict(ols, newdata = dat, weights = wgt)
+    diff <- pred_y1 - pred_y0
+    n_obs <- length(Y)
+    Y_diff <- weighted.mean(diff, wgt)
+    Y_diff_sd <- sqrt((weighted.mean(diff^2, wgt) - Y_diff^2) / n_obs)
+    ci <- cor_ci(estimates, length(Y), alpha)
   }
-  estimates_sd <- apply(res$t[,-(n + 1), drop = F], 2, sd)
-  ci <- boot_ci(res$t[,-(n + 1), drop = F], alpha)
   #we dont need standardization factor if we have only one variable
   stand_factor <- ifelse(n == 1, 1, sd(estimates))
   new_sample <- cbind(X, control, wgt, wgt1) #return also wgt for plot_change()
+  method <- ifelse(method == "crr", "correlations",
+                   ifelse(method == "nn-", "non-parametric", "nearest-neighbors"))
   output <- list(estimates = estimates / stand_factor,
                  estimates_sd = estimates_sd / stand_factor,
-                 details = list(Y_diff = res$t0[n + 1],
-                                Y_diff_sd = sd(res$t[,n + 1]),
+                 details = list(Y_diff = Y_diff,
+                                Y_diff_sd = Y_diff_sd,
                                 method = method,
                                 lambda = lambda,
                                 signs = signs,

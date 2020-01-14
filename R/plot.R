@@ -75,8 +75,9 @@ plot.optint <- function(object, plot.vars = "sig", plot.ci = T,
     if(x$details$method == "correlations"){
       #flip ci for negative estimates
       neg_est <- x$details$signs[inc] < 0
-      up_ci[neg_est] <- -1 * low_ci[neg_est]
+      temp_ci <- -1 * low_ci[neg_est]
       low_ci[neg_est] <- -1 * up_ci[neg_est]
+      up_ci[neg_est] <- temp_ci
     }
     #plot
     graph_bor <- c(min(min(low_ci), 0), max(up_ci))
@@ -116,7 +117,7 @@ plot.optint <- function(object, plot.vars = "sig", plot.ci = T,
 #' @export
 
 plot_change <- function(object, plot.vars = "sig",
-                        graph.col = c("lightcoral", "cadetblue3"),
+                        graph.col = c("red", "blue"),
                         alpha = 0.05, line.type = c(1,2), n.val = 10, ...){
   x <- object
   if(x$details$method == "correlations")
@@ -289,6 +290,7 @@ plot.optint_by_group <- function(object,
     }
   }
   #add legend
+  #legend isnt stable. change it.
   group_names <- colnames(est)
   legend("bottomright", group_names, col = graph.col, pch = 19, cex = 1)
   #add vertical line at 0
