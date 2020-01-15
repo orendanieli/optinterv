@@ -147,21 +147,10 @@ optint <- function(Y, X,
     ols <- lm(Y ~ cbind(X, control), weights = wgt)
     y_hat <- predict(ols)
     #make E(y_hat) = 0
-    y_hat <- y_hat - mean(y_hat)
+    y_hat <- y_hat - weighted.mean(y_hat, wgt)
     n_obs <- length(Y)
     Y_diff <- (1 / lambda) * weighted.mean(y_hat^2, wgt)
     Y_diff_sd <- sqrt(Hmisc::wtd.var(y_hat^2, wgt) / (n_obs * lambda^2))
-    #print(Y_diff_sd)
-    #boot_func <- function(d, i){
-    #  ols <- lm(Y[i] ~ cbind(X[i,,drop=F], control[i,,drop=F]), weights = wgt[i])
-    #  y_hat <- predict(ols)
-    #  y_hat <- y_hat - mean(y_hat)
-    #  Y_diff <- weighted.mean(y_hat^2, wgt[i])
-    #  Y_diff <- (1 / lambda) * Y_diff
-    #  return(Y_diff)
-    #}
-    #res_boot <- boot::boot(1:length(Y), boot_func, n.boot, stype = "i")
-    #Y_diff_sd <- sd(res_boot$t)
     #update X
     X <- t(t(X) + ni)
     wgt1 <- wgt
