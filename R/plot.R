@@ -240,17 +240,17 @@ plot.optint_by_group <- function(x,
       inc <- which(var_names %in% plot.vars)
     }
   }
-  var_names <- var_names[inc]
   var_max <- var_max[inc]
+  #sort to put the highest values first
+  inc <- inc[order(abs(var_max))]
   tstat_min <- tstat_min[inc]
+  var_names <- var_names[inc]
   #sign is based on the higher point estimate
   sgn <- sign(var_max)
   #add sign to name
   var_names <- add_sign(var_names, sgn)
   #add star if at least one difference is significant
-  var_names <- paste0(ifelse(tstat_min > z, "*", ""), var_names)
-  #sort to put the highest values first
-  inc <- inc[order(abs(var_max))]
+  var_names <- paste0(ifelse(tstat_min > z, "\u002A", ""), var_names)
   #go back to original estimates (not absolut):
   est <- x$est[inc,]
   sd <- sd[inc,]
