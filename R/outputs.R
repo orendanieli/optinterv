@@ -70,6 +70,7 @@ per_distance <- function(x, n.quant,
 #' @inheritParams per_distance
 #'
 #' @return vector of means.
+#' @importFrom stats weighted.mean
 
 wtd_bin <- function(x, n.quant, wgt){
   #set weights to sum to number of quants
@@ -114,6 +115,7 @@ kl_dist_def <- function(wgt, wgt1){
 #' @param ni difference in means (mu1 - mu0)
 #'
 #' @return scalar of kullback-liebler divergence.
+#' @importFrom stats cov.wt
 
 kl_dist_cor <- function(X, wgt, ni){
   vcov <- cov.wt(X, wgt)$cov
@@ -128,12 +130,14 @@ kl_dist_cor <- function(X, wgt, ni){
 #' @param alpha significance level
 #'
 #' @return matrix of confidence intervals
+#' @importFrom stats quantile
 
 boot_ci <- function(boot.res, alpha = 0.05){
   quant <- alpha / 2
   ci <- apply(boot.res, 2, function(x){quantile(x, probs = c(quant, 1 - quant))})
   return(ci)
 }
+
 
 cor_ci <- function(estimates, n, alpha = 0.05){
   z <- 0.5 * log((1 + estimates) / (1 - estimates))
@@ -157,6 +161,8 @@ cor_ci <- function(estimates, n, alpha = 0.05){
 #' @inheritParams optint
 #'
 #' @return vector of p values.
+#' @importFrom pbapply setpb startpb closepb
+#' @importFrom boot boot
 
 perm_test <- function(estimates, wgt, wgt1, X, n.quant, n.perm = 1000,
                       Y = NULL, control = NULL, func = "non_parm"){
@@ -164,7 +170,7 @@ perm_test <- function(estimates, wgt, wgt1, X, n.quant, n.perm = 1000,
   if(func == "nn"){
     perm_func <- function(d, i){
       #print progress:
-      pbapply::setpb(pb, rep_count)
+      setpb(pb, rep_count)
       rep_count <<- rep_count + 1
       wgt1 <- nn(Y, d[i,,drop = F], control, wgt)
       apply(d[i,,drop = F], 2,
@@ -172,7 +178,7 @@ perm_test <- function(estimates, wgt, wgt1, X, n.quant, n.perm = 1000,
     } else {
       perm_func <- function(d, i){
         #print progress:
-        pbapply::setpb(pb, rep_count)
+        setpb(pb, rep_count)
         rep_count <<- rep_count + 1
         apply(d[i,,drop = F], 2,
               function(x) per_distance(x, n.quant, wgt, wgt1))}
@@ -181,9 +187,9 @@ perm_test <- function(estimates, wgt, wgt1, X, n.quant, n.perm = 1000,
   rep_count <- 1
   cat("Calculating p-value:", "\n")
   #start report:
-  pb <- pbapply::startpb(min = 0, max = n.perm)
-  res <- boot::boot(X, perm_func, sim = "permutation", n.perm, stype = "i")
-  pbapply::closepb(pb)
+  pb <- startpb(min = 0, max = n.perm)
+  res <- boot(X, perm_func, sim = "permutation", n.perm, stype = "i")
+  closepb(pb)
   #necessary for pbapply:
   rep_count <- 1
   p_val <- rep(NA, p)
@@ -193,7 +199,7 @@ perm_test <- function(estimates, wgt, wgt1, X, n.quant, n.perm = 1000,
   return(p_val)
 }
 
-
+#' @importFrom stats weighted.mean
 mean_diff <- function(x, wgt, wgt1){
   diff <- weighted.mean(x, wgt1) - weighted.mean(x, wgt)
   return(diff)
@@ -202,7 +208,8 @@ mean_diff <- function(x, wgt, wgt1){
 #' Bootstrap (default)
 
 #' Bootstrap function for the non-parametric and the nearest neighbor methods
-#' @param func
+#'
+#' @param func a function for weights calculation (nn / non_parm).
 #' @param Y the original outcome.
 #' @param Y_pos outcome after exponential transformation (if needed).
 #' @param X the original X matrix.
@@ -210,13 +217,15 @@ mean_diff <- function(x, wgt, wgt1){
 #' @inheritParams optint
 #'
 #' @return a list - the output from the function 'boot()'.
+#' @importFrom pbapply setpb startpb closepb
+#' @importFrom boot boot
 
 boot_default <- function(func, Y, Y_pos, X, X_std, control, wgt, n.quant,
                          lambda, sigma, grp.size, n.boot, quick){
   #create bootstrap function
   boot_func <- function(d, i){
     #print progress:
-    pbapply::setpb(pb, rep_count)
+    setpb(pb, rep_count)
     rep_count <<- rep_count + 1
     w <- do.call(func, list(Y_pos[i], X_std[i,,drop = F], control[i,,drop = F],
                             wgt =  wgt[i], lambda =  lambda, sigma = sigma,
@@ -234,9 +243,9 @@ boot_default <- function(func, Y, Y_pos, X, X_std, control, wgt, n.quant,
   rep_count <-  1
   cat("Calculating standard errors:", "\n")
   #start report:
-  pb <- pbapply::startpb(min = 0, max = n.boot)
-  res <- boot::boot(1:length(Y), boot_func, n.boot, stype = "i")
-  pbapply::closepb(pb)
+  pb <- startpb(min = 0, max = n.boot)
+  res <- boot(1:length(Y), boot_func, n.boot, stype = "i")
+  closepb(pb)
   #necessary for pbapply:
   rep_count <- 1
   return(res)

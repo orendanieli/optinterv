@@ -8,6 +8,41 @@ Bootstrap function for the non-parametric and the nearest neighbor methods}
 boot_default(func, Y, Y_pos, X, X_std, control, wgt, n.quant, lambda,
   sigma, grp.size, n.boot, quick)
 }
+\arguments{
+\item{func}{a function for weights calculation (nn / non_parm).}
+
+\item{Y}{the original outcome.}
+
+\item{Y_pos}{outcome after exponential transformation (if needed).}
+
+\item{X}{the original X matrix.}
+
+\item{X_std}{X matrix after standardization.}
+
+\item{control}{numeric data frame or matrix of factors to control for. these are factors
+that we can't consider while looking for the optimal intervention
+(e.g. race).}
+
+\item{wgt}{an optional vector of weights.}
+
+\item{n.quant}{number of quantiles to use when calculating CDF distance.}
+
+\item{lambda}{the lagrange multiplier. also known as the shadow price of an
+intervention.}
+
+\item{sigma}{distance penalty for the nearest-neighbors method.}
+
+\item{grp.size}{for the nearest-neighbors method; if the number of examples in each
+control group is smaller than grp.size, performs weight adjustment
+using \code{\link[optinterv]{wgt_adjust}}. else,
+calculate weights seperatly for each control group.}
+
+\item{n.boot}{number of bootstrap replications to use for the standard errors /
+confidence intervals calculation.}
+
+\item{quick}{logical. if TRUE, returns only \eqn{E(X | I=1) - E(X | I=0)} as an estimate.
+this estimate is used by \code{\link{optint_by_group}}.}
+}
 \value{
 a list - the output from the function 'boot()'.
 }

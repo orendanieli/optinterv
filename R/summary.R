@@ -6,6 +6,7 @@
 #' @param r number of decimal places to use.
 #'
 #' @export
+#' @importFrom stats pnorm
 
 summary.optint <- function(object, r = 4){
   x <- object

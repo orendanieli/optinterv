@@ -51,6 +51,7 @@ var_pos <- function(x, plot.vars = "sig", alpha){
 #' @param alpha significance level for the confidence intervals. also
 #'              used in order to determine which variables are significant.
 #' @export
+#' @importFrom graphics abline dotchart lines title
 
 plot.optint <- function(x, plot.vars = "sig", plot.ci = T,
                         graph.col = 1, alpha = 0.05){
@@ -113,6 +114,7 @@ plot.optint <- function(x, plot.vars = "sig", plot.ci = T,
 #' @param line.type line type for \code{\link[lattice]{densityplot}}
 #' @inheritParams plot.optint
 #' @export
+#' @importFrom stats weighted.mean
 
 plot_change <- function(x, plot.vars = "sig",
                         graph.col = c("red", "blue"),
@@ -195,6 +197,8 @@ plot_change <- function(x, plot.vars = "sig",
 #'                  or a vector with names of variables to plot.
 #' @inheritParams plot.optint
 #' @export
+#' @importFrom graphics abline dotchart lines points lines legend
+#' @importFrom stats qnorm
 
 plot.optint_by_group <- function(x,
                                  plot.vars = "sig",

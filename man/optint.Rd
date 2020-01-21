@@ -84,6 +84,3 @@ print a summary of the results.
 identifies the factors with the greatest potential to increase
 a pre-specified outcome, using varius methods.
 }
-\examples{
-
-}

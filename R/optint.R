@@ -54,9 +54,9 @@
 #' In addition, the function \code{\link[base]{summary}} can be used to
 #' print a summary of the results.
 #'
-#' @examples
-#'
 #' @export
+#' @importFrom stats sd lm predict runif
+
 
 optint <- function(Y, X,
                   control = NULL,

@@ -16,7 +16,9 @@ Imports:
     boot,
     lattice,
     pbapply,
-    Hmisc
+    Hmisc,
+    stats,
+    graphics
 RoxygenNote: 6.1.1
 Suggests: 
     knitr,

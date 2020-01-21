@@ -69,6 +69,7 @@ dev_moments <- function(beta, base, control, wgt){
 #' @inheritParams optint
 #'
 #' @return vector of unadjusted weights under I = 1
+#' @importFrom stats cov.wt
 
 nn_wgt <- function(Y, X, control = NULL, wgt = rep(1, length(Y)),
                    lambda = 100, sigma = 1, test = F){
@@ -161,6 +162,7 @@ nn <- function(Y, X, control = NULL, wgt = rep(1, length(Y)),
 #' @inheritParams optint
 #'
 #' @return data frame with partial correlations, partial covariance & p-values.
+#' @importFrom stats lm sd
 
 par_cor = function(Y, X, control = NULL, wgt = rep(1, length(Y))){
   Y_sd <- sd(Y)
