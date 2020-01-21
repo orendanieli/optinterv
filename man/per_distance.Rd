@@ -4,7 +4,7 @@
 \alias{per_distance}
 \title{Distance Between Distributions}
 \usage{
-per_distance(x, n.quant, wgt, wgt1, p = 2/3, plot.sign = F, ...)
+per_distance(x, n.quant, wgt, wgt1, p = 2/3, plot.sign = F)
 }
 \arguments{
 \item{x}{variable.}

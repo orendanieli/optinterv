@@ -6,7 +6,7 @@
 Test the null hypothesis P(X|I=0) = P(X|I=1), using permutation test.}
 \usage{
 perm_test(estimates, wgt, wgt1, X, n.quant, n.perm = 1000, Y = NULL,
-  control = NULL, func = "non_parm", ...)
+  control = NULL, func = "non_parm")
 }
 \arguments{
 \item{estimates}{point estimates of the percentile distance between P(X|I=0) & P(X|I=1).}

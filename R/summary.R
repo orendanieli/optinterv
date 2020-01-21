@@ -7,7 +7,7 @@
 #'
 #' @export
 
-summary.optint <- function(object, r = 4, ...){
+summary.optint <- function(object, r = 4){
   x <- object
   est <- round(x$estimates, r)
   se <- round(x$estimates_sd, r)

@@ -4,7 +4,7 @@
 \alias{wgt_adjust}
 \title{Weights adjustment}
 \usage{
-wgt_adjust(control, base.wgt1, wgt, ...)
+wgt_adjust(control, base.wgt1, wgt)
 }
 \arguments{
 \item{control}{numeric data frame or matrix of factors to control for. these are factors

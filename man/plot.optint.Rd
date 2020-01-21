@@ -5,7 +5,7 @@
 \title{Plot optint object}
 \usage{
 \method{plot}{optint}(x, plot.vars = "sig", plot.ci = T,
-  graph.col = 1, alpha = 0.05, ...)
+  graph.col = 1, alpha = 0.05)
 }
 \arguments{
 \item{x}{an optint object.}

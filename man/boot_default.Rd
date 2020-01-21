@@ -6,7 +6,7 @@
 Bootstrap function for the non-parametric and the nearest neighbor methods}
 \usage{
 boot_default(func, Y, Y_pos, X, X_std, control, wgt, n.quant, lambda,
-  sigma, grp.size, n.boot, quick, ...)
+  sigma, grp.size, n.boot, quick)
 }
 \value{
 a list - the output from the function 'boot()'.

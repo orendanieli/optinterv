@@ -1,4 +1,4 @@
-validate_data <- function(Y, X, control = NULL, wgt, ...){
+validate_data <- function(Y, X, control = NULL, wgt){
   n <- length(Y)
   if(!inherits(X, c("matrix","data.frame")) || n != nrow(X)){
     stop(paste("X must be either matrix or data.frame,",

@@ -5,7 +5,7 @@
 \title{Plot the change in the distribution of X}
 \usage{
 plot_change(x, plot.vars = "sig", graph.col = c("red", "blue"),
-  alpha = 0.05, line.type = c(1, 2), n.val = 10, ...)
+  alpha = 0.05, line.type = c(1, 2), n.val = 10)
 }
 \arguments{
 \item{x}{an optint object.}

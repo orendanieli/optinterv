@@ -4,7 +4,7 @@
 \alias{par_cor}
 \title{Partial Correlation}
 \usage{
-par_cor(Y, X, control = NULL, wgt = rep(1, length(Y)), ...)
+par_cor(Y, X, control = NULL, wgt = rep(1, length(Y)))
 }
 \arguments{
 \item{Y}{outcome vector (must be numeric without NA's).}

@@ -20,6 +20,8 @@ that we can't consider while looking for the optimal intervention
 
 \item{lambda}{the lagrange multiplier. also known as the shadow price of an
 intervention.}
+
+\item{...}{additional arguments.}
 }
 \value{
 vector of weights under I = 1

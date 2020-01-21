@@ -4,7 +4,7 @@
 \alias{kl_dist_def}
 \title{Kullback-Leibler Divergence}
 \usage{
-kl_dist_def(wgt, wgt1, ...)
+kl_dist_def(wgt, wgt1)
 }
 \arguments{
 \item{wgt}{original weights.}

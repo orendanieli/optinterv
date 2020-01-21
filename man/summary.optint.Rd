@@ -4,7 +4,7 @@
 \alias{summary.optint}
 \title{Summary for optint object}
 \usage{
-\method{summary}{optint}(object, r = 4, ...)
+\method{summary}{optint}(object, r = 4)
 }
 \arguments{
 \item{object}{an optint object.}

@@ -4,7 +4,7 @@
 \alias{dev_moments}
 \title{Moment deviation}
 \usage{
-dev_moments(beta, base, control, wgt, ...)
+dev_moments(beta, base, control, wgt)
 }
 \arguments{
 \item{beta}{a lagrange multiplier}

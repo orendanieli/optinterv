@@ -16,7 +16,7 @@ add_sign <- function(names, signs){
 #' @inheritParams plot.optint
 #' @return vector of variables incidents
 
-var_pos <- function(x, plot.vars = "sig", alpha, ...){
+var_pos <- function(x, plot.vars = "sig", alpha){
   n <- length(x$estimates)
   #estimates positions
   if(is.numeric(plot.vars)){
@@ -53,7 +53,7 @@ var_pos <- function(x, plot.vars = "sig", alpha, ...){
 #' @export
 
 plot.optint <- function(x, plot.vars = "sig", plot.ci = T,
-                        graph.col = 1, alpha = 0.05, ...){
+                        graph.col = 1, alpha = 0.05){
   inc <- var_pos(x, plot.vars, alpha)
   estimates <- x$estimates[inc]
   #absolute value of point estimates
@@ -116,7 +116,7 @@ plot.optint <- function(x, plot.vars = "sig", plot.ci = T,
 
 plot_change <- function(x, plot.vars = "sig",
                         graph.col = c("red", "blue"),
-                        alpha = 0.05, line.type = c(1,2), n.val = 10, ...){
+                        alpha = 0.05, line.type = c(1,2), n.val = 10){
   if(x$details$method == "correlations")
     stop(paste("plot_change() isn't available for the correlations method.",
                "the distribution of x just shifts by 1/lambda * cov(x,y)"))
@@ -199,7 +199,7 @@ plot_change <- function(x, plot.vars = "sig",
 plot.optint_by_group <- function(x,
                                  plot.vars = "sig",
                                  graph.col = NULL,
-                                 alpha = 0.05, ...){
+                                 alpha = 0.05){
   est <- x$est
   sd <- x$sd
   n_group <- ncol(est)

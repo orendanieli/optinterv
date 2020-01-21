@@ -8,7 +8,7 @@ optint(Y, X, control = NULL, wgt = rep(1, length(Y)),
   method = "non-parametric", lambda = 100, sigma = 1,
   grp.size = 30, n.boot = 1000, sign.factor = 2/3, alpha = 0.05,
   n.quant = floor(length(Y)/10), perm.test = T, n.perm = 1000,
-  quick = F, plot = T, seed = runif(1, 0, .Machine$integer.max), ...)
+  quick = F, plot = T, seed = runif(1, 0, .Machine$integer.max))
 }
 \arguments{
 \item{Y}{outcome vector (must be numeric without NA's).}

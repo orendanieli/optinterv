@@ -4,7 +4,7 @@
 \alias{var_pos}
 \title{Variable Position}
 \usage{
-var_pos(x, plot.vars = "sig", alpha, ...)
+var_pos(x, plot.vars = "sig", alpha)
 }
 \arguments{
 \item{x}{an optint object.}

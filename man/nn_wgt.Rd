@@ -5,7 +5,7 @@
 \title{Nearest-neighbors weights}
 \usage{
 nn_wgt(Y, X, control = NULL, wgt = rep(1, length(Y)), lambda = 100,
-  sigma = 1, test = F, ...)
+  sigma = 1, test = F)
 }
 \arguments{
 \item{Y}{outcome vector (must be numeric without NA's).}

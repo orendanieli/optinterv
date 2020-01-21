@@ -4,7 +4,7 @@
 \alias{kl_dist_cor}
 \title{Kullback-Leibler Divergence}
 \usage{
-kl_dist_cor(X, wgt, ni, ...)
+kl_dist_cor(X, wgt, ni)
 }
 \arguments{
 \item{X}{numeric data frame or matrix of factors to be considered.}

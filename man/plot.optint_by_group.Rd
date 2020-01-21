@@ -5,7 +5,7 @@
 \title{Plot optint object, by group}
 \usage{
 \method{plot}{optint_by_group}(x, plot.vars = "sig", graph.col = NULL,
-  alpha = 0.05, ...)
+  alpha = 0.05)
 }
 \arguments{
 \item{x}{an optint_by_group object.}

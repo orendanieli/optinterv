@@ -73,8 +73,7 @@ optint <- function(Y, X,
                   n.perm = 1000,
                   quick = F,
                   plot = T,
-                  seed = runif(1, 0, .Machine$integer.max),
-                  ...){
+                  seed = runif(1, 0, .Machine$integer.max)){
   validate_data(Y, X, control, wgt = wgt)
   #create var names if missing
   n <- ncol(X)

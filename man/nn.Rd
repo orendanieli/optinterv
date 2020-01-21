@@ -27,6 +27,8 @@ intervention.}
 control group is smaller than grp.size, performs weight adjustment
 using \code{\link[optinterv]{wgt_adjust}}. else,
 calculate weights seperatly for each control group.}
+
+\item{...}{additional arguments.}
 }
 \value{
 vector of adjusted weights under I = 1

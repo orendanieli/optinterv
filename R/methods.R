@@ -4,7 +4,7 @@
 #' Non-parametric method
 #'
 #' Calculates weights under I = 1, using the non-parametric method
-#'
+#' @param ... additional arguments.
 #' @inheritParams optint
 #'
 #' @return vector of weights under I = 1
@@ -27,7 +27,7 @@ non_parm <- function(Y, X, control = NULL, wgt = rep(1, length(Y)), lambda = 100
 #' @inheritParams optint
 #'
 #' @return vector of adjusted weights under I = 1
-wgt_adjust <- function(control, base.wgt1, wgt, ...){
+wgt_adjust <- function(control, base.wgt1, wgt){
   control <- as.matrix(control)
   #add a constant vector to control
   control <- as.matrix(cbind(rep(1, nrow(control)), control))
@@ -52,7 +52,7 @@ wgt_adjust <- function(control, base.wgt1, wgt, ...){
 #'
 #' @return vector of moment deviations
 
-dev_moments <- function(beta, base, control, wgt, ...){
+dev_moments <- function(beta, base, control, wgt){
   #calculate probs for a given beta
   p <- base * exp(control %*% as.matrix(beta))
   #calculate the difference in means between the two distributions
@@ -71,7 +71,7 @@ dev_moments <- function(beta, base, control, wgt, ...){
 #' @return vector of unadjusted weights under I = 1
 
 nn_wgt <- function(Y, X, control = NULL, wgt = rep(1, length(Y)),
-                   lambda = 100, sigma = 1, test = F, ...){
+                   lambda = 100, sigma = 1, test = F){
   char_matrix <- cbind(X, control)
   vcov <- cov.wt(char_matrix, wgt)$cov
   #calculate mehalanobis distance for all pairs
@@ -101,6 +101,7 @@ nn_wgt <- function(Y, X, control = NULL, wgt = rep(1, length(Y)),
 #'
 #' Calculates adjusted weights under I = 1, using the nearest-neighbors method
 #'
+#' @param ... additional arguments.
 #' @inheritParams optint
 #'
 #' @return vector of adjusted weights under I = 1
@@ -161,7 +162,7 @@ nn <- function(Y, X, control = NULL, wgt = rep(1, length(Y)),
 #'
 #' @return data frame with partial correlations, partial covariance & p-values.
 
-par_cor = function(Y, X, control = NULL, wgt = rep(1, length(Y)), ...){
+par_cor = function(Y, X, control = NULL, wgt = rep(1, length(Y))){
   Y_sd <- sd(Y)
   X_sd <- apply(X, 2, sd)
   if(!is.null(control)){

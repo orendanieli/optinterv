@@ -41,8 +41,7 @@ per_distance <- function(x, n.quant,
                          wgt,
                          wgt1,
                          p = 2/3,
-                         plot.sign = F,
-                         ...) {
+                         plot.sign = F) {
   #fix weights to sum to data length
   wgt  <- (wgt / sum(wgt)) * length(wgt)
   wgt1 <- (wgt1 / sum(wgt1)) * length(wgt1)
@@ -98,7 +97,7 @@ wtd_bin <- function(x, n.quant, wgt){
 #'
 #' @return scalar of kullback-liebler divergence.
 
-kl_dist_def <- function(wgt, wgt1, ...){
+kl_dist_def <- function(wgt, wgt1){
   #make weights sum to 1
   wgt <- wgt / sum(wgt)
   wgt1 <- wgt1 / sum(wgt1)
@@ -116,7 +115,7 @@ kl_dist_def <- function(wgt, wgt1, ...){
 #'
 #' @return scalar of kullback-liebler divergence.
 
-kl_dist_cor <- function(X, wgt, ni, ...){
+kl_dist_cor <- function(X, wgt, ni){
   vcov <- cov.wt(X, wgt)$cov
   return(t(ni) %*% vcov %*% ni)
 }
@@ -160,7 +159,7 @@ cor_ci <- function(estimates, n, alpha = 0.05){
 #' @return vector of p values.
 
 perm_test <- function(estimates, wgt, wgt1, X, n.quant, n.perm = 1000,
-                      Y = NULL, control = NULL, func = "non_parm", ...){
+                      Y = NULL, control = NULL, func = "non_parm"){
   p <- ncol(X)
   if(func == "nn"){
     perm_func <- function(d, i){
@@ -203,10 +202,17 @@ mean_diff <- function(x, wgt, wgt1){
 #' Bootstrap (default)
 
 #' Bootstrap function for the non-parametric and the nearest neighbor methods
+#' @param func
+#' @param Y the original outcome.
+#' @param Y_pos outcome after exponential transformation (if needed).
+#' @param X the original X matrix.
+#' @param X_std X matrix after standardization.
+#' @inheritParams optint
+#'
 #' @return a list - the output from the function 'boot()'.
 
 boot_default <- function(func, Y, Y_pos, X, X_std, control, wgt, n.quant,
-                         lambda, sigma, grp.size, n.boot, quick, ...){
+                         lambda, sigma, grp.size, n.boot, quick){
   #create bootstrap function
   boot_func <- function(d, i){
     #print progress:
