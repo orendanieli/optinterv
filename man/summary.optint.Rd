@@ -4,12 +4,14 @@
 \alias{summary.optint}
 \title{Summary for optint object}
 \usage{
-\method{summary}{optint}(object, r = 4)
+\method{summary}{optint}(object, r = 4, ...)
 }
 \arguments{
 \item{object}{an optint object.}
 
 \item{r}{number of decimal places to use.}
+
+\item{...}{additional arguments.}
 }
 \description{
 Report results from an optint object.

@@ -13,6 +13,8 @@ perm_test(estimates, wgt, wgt1, X, n.quant, n.perm = 1000, Y = NULL,
 
 \item{wgt}{an optional vector of weights.}
 
+\item{wgt1}{weights under I = 1.}
+
 \item{X}{numeric data frame or matrix of factors to be considered.}
 
 \item{n.quant}{number of quantiles to use when calculating CDF distance.}

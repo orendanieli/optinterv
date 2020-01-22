@@ -50,11 +50,12 @@ var_pos <- function(x, plot.vars = "sig", alpha){
 #' @param graph.col graph color/s.
 #' @param alpha significance level for the confidence intervals. also
 #'              used in order to determine which variables are significant.
+#' @param ... additional arguments.
 #' @export
 #' @importFrom graphics abline dotchart lines title
 
 plot.optint <- function(x, plot.vars = "sig", plot.ci = T,
-                        graph.col = 1, alpha = 0.05){
+                        graph.col = 1, alpha = 0.05, ...){
   inc <- var_pos(x, plot.vars, alpha)
   estimates <- x$estimates[inc]
   #absolute value of point estimates
@@ -81,7 +82,7 @@ plot.optint <- function(x, plot.vars = "sig", plot.ci = T,
     #plot
     graph_bor <- c(min(min(low_ci), 0), max(up_ci))
     dotchart(estimates, var_names, xlim = graph_bor, pch = 19, cex = fsize,
-             col = graph.col, col.axis = 2)
+             color = graph.col, col.axis = 2)
     #add CIs manually as lines
     j <- 1
     n <- length(inc)
@@ -92,7 +93,7 @@ plot.optint <- function(x, plot.vars = "sig", plot.ci = T,
   } else {
     dotchart(estimates, var_names, xlim = c(0, max(estimates)), pch = 19,
              cex = fsize,
-             col = .col, col.axis = 2)
+             color = .col, col.axis = 2)
   }
   #add 0
   abline(v = 0, lty = 2, col = 2)
@@ -196,6 +197,7 @@ plot_change <- function(x, plot.vars = "sig",
 #'                  at least one group, or that there is significant heterogeneity),
 #'                  or a vector with names of variables to plot.
 #' @inheritParams plot.optint
+#' @param ... additional arguments.
 #' @export
 #' @importFrom graphics abline dotchart lines points lines legend
 #' @importFrom stats qnorm
@@ -203,7 +205,7 @@ plot_change <- function(x, plot.vars = "sig",
 plot.optint_by_group <- function(x,
                                  plot.vars = "sig",
                                  graph.col = NULL,
-                                 alpha = 0.05){
+                                 alpha = 0.05, ...){
   est <- x$est
   sd <- x$sd
   n_group <- ncol(est)
@@ -275,7 +277,7 @@ plot.optint_by_group <- function(x,
   fsize <- ifelse(n_vars  > 20, 0.5, 0.9)
   #empty plot with correct borders
   dotchart(rep(80, n_vars), var_names,
-           pch = 19, cex = fsize, col = 1,
+           pch = 19, cex = fsize, color = 1,
            col.axis = 2,
            xlim = x_lim)
   #add points  and CIs

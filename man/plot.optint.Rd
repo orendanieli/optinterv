@@ -5,7 +5,7 @@
 \title{Plot optint object}
 \usage{
 \method{plot}{optint}(x, plot.vars = "sig", plot.ci = T,
-  graph.col = 1, alpha = 0.05)
+  graph.col = 1, alpha = 0.05, ...)
 }
 \arguments{
 \item{x}{an optint object.}
@@ -22,6 +22,8 @@ plot only point estimates.}
 
 \item{alpha}{significance level for the confidence intervals. also
 used in order to determine which variables are significant.}
+
+\item{...}{additional arguments.}
 }
 \description{
 Produce variable importance plot from an optint object.

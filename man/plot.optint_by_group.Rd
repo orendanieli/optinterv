@@ -5,7 +5,7 @@
 \title{Plot optint object, by group}
 \usage{
 \method{plot}{optint_by_group}(x, plot.vars = "sig", graph.col = NULL,
-  alpha = 0.05)
+  alpha = 0.05, ...)
 }
 \arguments{
 \item{x}{an optint_by_group object.}
@@ -21,6 +21,8 @@ or a vector with names of variables to plot.}
 
 \item{alpha}{significance level for the confidence intervals. also
 used in order to determine which variables are significant.}
+
+\item{...}{additional arguments.}
 }
 \description{
 Produce variables importance plot from an optint_by_group object.

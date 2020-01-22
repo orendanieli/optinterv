@@ -4,11 +4,12 @@
 #'
 #' @param object an optint object.
 #' @param r number of decimal places to use.
+#' @param ... additional arguments.
 #'
 #' @export
 #' @importFrom stats pnorm
 
-summary.optint <- function(object, r = 4){
+summary.optint <- function(object, r = 4, ...){
   x <- object
   est <- round(x$estimates, r)
   se <- round(x$estimates_sd, r)
@@ -56,8 +57,5 @@ gen_star <- function(p_val){
   stars[p_val < 0.01] <- "\u002A\u002A\u002A"
   return(stars)
 }
-
-
-
 
 

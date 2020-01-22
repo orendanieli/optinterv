@@ -2,10 +2,11 @@ Package: optinterv
 Type: Package
 Title: Optimal Intervention
 Version: 0.1.0
-Author: Oren Danieli & Elad Guttman
-Maintainer: Elad <eladguttman@mail.tau.ac.il>
+Authors@R: c(
+  person("Elad", "Guttman", role = c("aut", "cre"), email = "eladguttman@mail.tau.ac.il"),
+  person("Oren", "Danieli", role = "aut"))
 Description: Identifies the factors with the greatest potential 
-  to increase a pre-specified outcome, using observational data.
+  to increase a prespecified outcome, using observational data.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true

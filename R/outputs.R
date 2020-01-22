@@ -158,6 +158,7 @@ cor_ci <- function(estimates, n, alpha = 0.05){
 #' @param func either "non_parm" or "nn". for "nn", weights are recalculated for each
 #'             permutation, and thus Y and control are needed. the default is "non_parm",
 #'             and Y and control aren't needed.
+#' @param wgt1 weights under I = 1.
 #' @inheritParams optint
 #'
 #' @return vector of p values.
