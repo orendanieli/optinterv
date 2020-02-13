@@ -14,7 +14,7 @@
 indicating to plot the first n variables,
 "sig" (default) - plot only significant variables
 (here significant means that variabe is signifcant for
-at least one group, or that there is significant heterogeneity),
+all groups, or that there is significant heterogeneity),
 or a vector with names of variables to plot.}
 
 \item{graph.col}{graph color/s.}

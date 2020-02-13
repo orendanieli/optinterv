@@ -194,7 +194,7 @@ plot_change <- function(x, plot.vars = "sig",
 #'                  indicating to plot the first n variables,
 #'                  "sig" (default) - plot only significant variables
 #'                  (here significant means that variabe is signifcant for
-#'                  at least one group, or that there is significant heterogeneity),
+#'                  all groups, or that there is significant heterogeneity),
 #'                  or a vector with names of variables to plot.
 #' @inheritParams plot.optint
 #' @param ... additional arguments.
@@ -233,13 +233,13 @@ plot.optint_by_group <- function(x,
     if(plot.vars == "sig"){
       #lower low_ci by variable
       lower_ci_min <- apply(lower_ci, 1, min)
-      #take variables with significance difference between groups or with at
-      #least one significance group
+      #take variables with significance difference between groups or
+      #that significant for all groups
       inc <- which((lower_ci_min > 0 | tstat_min > z))
       if(length(inc) == 0){
         inc <- 1
-        warning(paste("There are no variables with significance difference",
-                      "between groups or with at least one significance group.",
+        warning(paste("There are no variables that significant for all groups,",
+                      "or with significant difference between groups.",
                       "displays the first variable"))
       }
     } else {

@@ -43,7 +43,7 @@ summary.optint <- function(object, r = 4, ...){
   cat("\n", "\n",coef_title, "\n", "\n")
   print(as.data.frame(coeffs))
   cat("---", "\n", "(1) Signif. codes: 0.1 '\u002A' 0.05 '\u002A\u002A' 0.01 '\u002A\u002A\u002A'")
-  cat("\n", "(2) The Kullback–Leibler divergence of P(X|I=0) from P(X|I=1) is:", kl, "\n")
+  cat("\n", "(2) The Kullback\u002DLeibler divergence of P(X|I=0) from P(X|I=1) is:", kl, "\n")
   cat("\n", "Outcome Difference (excluding zeros):", "\n", "\n")
   print(as.data.frame(out_mat))
   cat("---", "\n", "Note: Y is in log units")
