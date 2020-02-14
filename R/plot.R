@@ -251,6 +251,7 @@ plot.optint_by_group <- function(x,
   inc <- inc[order(abs(var_max))]
   tstat_min <- tstat_min[inc]
   var_names <- var_names[inc]
+  var_max <- var_max[order(var_max)]
   #sign is based on the higher point estimate
   sgn <- sign(var_max)
   #add sign to name
