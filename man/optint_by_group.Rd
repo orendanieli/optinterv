@@ -56,3 +56,29 @@ Similar to \code{\link{optint}}, identifies the factors with the greatest
 potential to increase a pre-specified outcome for each group separately, and thus allowing
 to detect heterogeneity between groups.
 }
+\examples{
+# generate data
+n <- 1000
+p <- 10
+features <- matrix(rnorm(n*p), ncol = p)
+men <- matrix(rbinom(n, 1, 0.5), nrow = n)
+outcome <- 2*(features[,1] > 1) + men*pmax(features[,2], 0) + rnorm(n)
+outcome <- as.vector(outcome)
+
+#find the optimal intervention using the non-parametric method:
+imp_feat <- optint(Y = outcome, X = features, control = men,
+                   method = "non-parametric", lambda = 10, plot = TRUE)
+
+#we can explore how the optimal intervention varies between genders using optint_by_group():
+men <- as.vector(men)
+imp_feat_by_gender <- optint_by_group(Y = outcome, X = features,
+                                      group = men,
+                                      method = "non-parametric",
+                                      lambda = 10)
+
+#by default, only the significant features are displayed
+#(see ?plot.optint_by_group for further details).
+#for customized variable importance plot, use plot():
+plot(imp_feat_by_gender, plot.vars = 10)
+
+}

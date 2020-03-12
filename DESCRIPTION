@@ -5,8 +5,15 @@ Version: 0.1.0
 Authors@R: c(
   person("Elad", "Guttman", role = c("aut", "cre"), email = "eladguttman@mail.tau.ac.il"),
   person("Oren", "Danieli", role = "aut"))
-Description: Identifies the factors with the greatest potential 
-  to increase a prespecified outcome, using observational data.
+Description: 
+  This package provides both parametric and non-parametric estimates of the 
+  correlates of some desired
+  outcome (e.g. test scores, income) using a new method proposed by 
+  Danieli, Devi and Fryer (2019). This method relaxes the assumption
+  that one can alter individual characteristics in any way the data 
+  suggest is optimal, and so can be used anytime one wants to use observational
+  data to better optimize social experiments designed to increase some desired
+  outcome.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true

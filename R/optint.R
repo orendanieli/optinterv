@@ -54,6 +54,26 @@
 #' In addition, the function \code{\link[base]{summary}} can be used to
 #' print a summary of the results.
 #'
+#' @examples
+#' # generate data
+#' n <- 1000
+#' p <- 10
+#' features <- matrix(rnorm(n*p), ncol = p)
+#' men <- matrix(rbinom(n, 1, 0.5), nrow = n)
+#' outcome <- 2*(features[,1] > 1) + men*pmax(features[,2], 0) + rnorm(n)
+#' outcome <- as.vector(outcome)
+#'
+#' #find the optimal intervention using the non-parametric method:
+#' imp_feat <- optint(Y = outcome, X = features, control = men,
+#'                    method = "non-parametric", lambda = 10, plot = TRUE)
+#'
+#' #by default, only the significant features are displayed
+#' #(see ?plot.optint for further details).
+#' #for customized variable importance plot, use plot():
+#' plot(imp_feat, plot.vars = 10)
+#'
+#' #show summary of the results using summary():
+#' summary(imp_feat)
 #' @export
 #' @importFrom stats sd lm predict runif
 
@@ -201,6 +221,31 @@ optint <- function(Y, X,
 #'             here estimates are \eqn{E(X | I=1) - E(X | I=0)}, and they are
 #'             used by \code{\link{plot.optint_by_group}}.}
 #'  \item{sd}{estimates standard deviation.}
+#'
+#' @examples
+#' # generate data
+#' n <- 1000
+#' p <- 10
+#' features <- matrix(rnorm(n*p), ncol = p)
+#' men <- matrix(rbinom(n, 1, 0.5), nrow = n)
+#' outcome <- 2*(features[,1] > 1) + men*pmax(features[,2], 0) + rnorm(n)
+#' outcome <- as.vector(outcome)
+#'
+#' #find the optimal intervention using the non-parametric method:
+#' imp_feat <- optint(Y = outcome, X = features, control = men,
+#'                    method = "non-parametric", lambda = 10, plot = TRUE)
+#'
+#' #we can explore how the optimal intervention varies between genders using optint_by_group():
+#' men <- as.vector(men)
+#' imp_feat_by_gender <- optint_by_group(Y = outcome, X = features,
+#'                                       group = men,
+#'                                       method = "non-parametric",
+#'                                       lambda = 10)
+#'
+#' #by default, only the significant features are displayed
+#' #(see ?plot.optint_by_group for further details).
+#' #for customized variable importance plot, use plot():
+#' plot(imp_feat_by_gender, plot.vars = 10)
 #'
 #' @export
 

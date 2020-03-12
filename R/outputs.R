@@ -186,7 +186,7 @@ perm_test <- function(estimates, wgt, wgt1, X, n.quant, n.perm = 1000,
   }
   #necessary variable for pbapply:
   rep_count <- 1
-  cat("Calculating p-value:", "\n")
+  message("Calculating p-value:", "\n")
   #start report:
   pb <- startpb(min = 0, max = n.perm)
   res <- boot(X, perm_func, sim = "permutation", n.perm, stype = "i")
@@ -242,7 +242,7 @@ boot_default <- function(func, Y, Y_pos, X, X_std, control, wgt, n.quant,
   }
   #necessary variable for pbapply:
   rep_count <-  1
-  cat("Calculating standard errors:", "\n")
+  message("Calculating standard errors:", "\n")
   #start report:
   pb <- startpb(min = 0, max = n.boot)
   res <- boot(1:length(Y), boot_func, n.boot, stype = "i")
