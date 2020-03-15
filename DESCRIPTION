@@ -6,7 +6,7 @@ Authors@R: c(
   person("Elad", "Guttman", role = c("aut", "cre"), email = "eladguttman@mail.tau.ac.il"),
   person("Oren", "Danieli", role = "aut"))
 Description: 
-  This package provides both parametric and non-parametric estimates of the 
+  Provides both parametric and non-parametric estimates of the 
   correlates of some desired
   outcome (e.g. test scores, income) using a new method proposed by 
   Danieli, Devi and Fryer (2019). This method relaxes the assumption

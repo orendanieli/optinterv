@@ -33,8 +33,8 @@ before and after the intervention.
 }
 \examples{
 # generate data
-n <- 1000
-p <- 10
+n <- 50
+p <- 3
 features <- matrix(rnorm(n*p), ncol = p)
 men <- matrix(rbinom(n, 1, 0.5), nrow = n)
 outcome <- 2*(features[,1] > 1) + men*pmax(features[,2], 0) + rnorm(n)
@@ -42,7 +42,8 @@ outcome <- as.vector(outcome)
 
 #find the optimal intervention using the non-parametric method:
 imp_feat <- optint(Y = outcome, X = features, control = men,
-                   method = "non-parametric", lambda = 10, plot = TRUE)
+                   method = "non-parametric", lambda = 10, plot = TRUE,
+                   n.boot = 100, n.perm = 100)
 
 #we can look on the new features distribution more deeply, using plot_change():
 plot_change(imp_feat, plot.vars = "sig")

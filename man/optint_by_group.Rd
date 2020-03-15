@@ -58,8 +58,8 @@ to detect heterogeneity between groups.
 }
 \examples{
 # generate data
-n <- 1000
-p <- 10
+n <- 50
+p <- 3
 features <- matrix(rnorm(n*p), ncol = p)
 men <- matrix(rbinom(n, 1, 0.5), nrow = n)
 outcome <- 2*(features[,1] > 1) + men*pmax(features[,2], 0) + rnorm(n)
@@ -67,7 +67,8 @@ outcome <- as.vector(outcome)
 
 #find the optimal intervention using the non-parametric method:
 imp_feat <- optint(Y = outcome, X = features, control = men,
-                   method = "non-parametric", lambda = 10, plot = TRUE)
+                   method = "non-parametric", lambda = 10, plot = TRUE,
+                   n.boot = 100, n.perm = 100)
 
 #we can explore how the optimal intervention varies between genders using optint_by_group():
 men <- as.vector(men)
@@ -79,6 +80,6 @@ imp_feat_by_gender <- optint_by_group(Y = outcome, X = features,
 #by default, only the significant features are displayed
 #(see ?plot.optint_by_group for further details).
 #for customized variable importance plot, use plot():
-plot(imp_feat_by_gender, plot.vars = 10)
+plot(imp_feat_by_gender, plot.vars = 3)
 
 }
