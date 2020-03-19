@@ -2,12 +2,20 @@
 optinterv: optimal intervention
 ===============================
 
+[![CRAN status](https://www.r-pkg.org/badges/version/optinterv)](https://cran.r-project.org/package=optinterv) [![metacran downloads](https://cranlogs.r-pkg.org/badges/optinterv)](https://cran.r-project.org/package=optinterv)
+
 An R package that implemnts the method proposed by Danieli, Devi and Fryer (2019), to identify the factors with the greatest potential to increase a pre-specified outcome, using observational data.
 
 Installation
 ------------
 
-Currently, the package can be installed through GitHub:
+You can install the stable version from CRAN:
+
+``` r
+install.packages("optinterv")
+```
+
+Or the development version from GitHub:
 
 ``` r
 #install.packages("devtools")
