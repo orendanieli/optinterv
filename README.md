@@ -22,8 +22,8 @@ Or the development version from GitHub:
 devtools::install_github("eladg9/optinterv")
 ```
 
-Useage Example
---------------
+Usage Example
+-------------
 
 ``` r
 library(optinterv)
