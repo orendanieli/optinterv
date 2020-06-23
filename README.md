@@ -19,7 +19,7 @@ Or the development version from GitHub:
 
 ``` r
 #install.packages("devtools")
-devtools::install_github("eladg9/optinterv")
+devtools::install_github("eladg9/optinterv/r-package")
 ```
 
 Usage Example
