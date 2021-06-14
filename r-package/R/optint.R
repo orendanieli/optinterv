@@ -130,7 +130,8 @@ optint <- function(Y, X,
     #estimates = apply(X_std, 2, function(v) per_distance(v, n.quant, wgt, wgt1))#
     if(perm.test){
       p_val <- perm_test(estimates, wgt, wgt1, X_std, n.quant, n.perm,
-                         Y_pos, control, func)
+                         Y_pos, control, func, lambda = lambda, sigma = sigma,
+                         grp.size = grp.size)
     } else {
       p_val <- rep(NA, n)
     }

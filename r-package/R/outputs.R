@@ -166,14 +166,16 @@ cor_ci <- function(estimates, n, alpha = 0.05){
 #' @importFrom boot boot
 
 perm_test <- function(estimates, wgt, wgt1, X, n.quant, n.perm = 1000,
-                      Y = NULL, control = NULL, func = "non_parm"){
+                      Y = NULL, control = NULL, func = "non_parm",
+                      lambda = 100, sigma = 1, grp.size = 30){
   p <- ncol(X)
   if(func == "nn"){
     perm_func <- function(d, i){
       #print progress:
       setpb(pb, rep_count)
       rep_count <<- rep_count + 1
-      wgt1 <- nn(Y, d[i,,drop = F], control, wgt)
+      wgt1 <- nn(Y, d[i,,drop = F], control, wgt, lambda = lambda,
+                 sigma = sigma, grp.size = grp.size)
       apply(d[i,,drop = F], 2,
             function(x) per_distance(x, n.quant, wgt, wgt1))}
     } else {
