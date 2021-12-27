@@ -8,18 +8,6 @@ add_sign <- function(names, signs){
   return(var_names)
 }
 
-#' Add astericks to variable names that are significant
-#'
-#' @param names vector of variable names.
-#' @param x optint object.
-#' @param alpha significance level).
-
-add_star <- function(x, names, alpha=0.05){
-  sig_var <- ifelse(x$details$p_value < alpha, "\u002A", "")
-  var_names <- paste0(sig_var, names)
-  return(var_names)
- }
-
 #' Variable Position
 #'
 #' Find which variables to plot.
@@ -79,8 +67,6 @@ plot.optint <- function(x, plot.vars = "sig", plot.ci = T,
   fsize <- ifelse(length(inc) > 20, 0.5, 0.9)
   #add sign to name
   var_names <- add_sign(var_names, x$details$signs[inc])
-  #add star to name
-  var_names <- add_star(x, names = var_names, alpha)
   if(plot.ci){
     #find values for confidence intervals
     low_ci <- x$details$ci[1,inc]
